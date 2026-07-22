@@ -1,0 +1,2223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>英语挖呀挖 · 结构刷一刷</title>
+  <style>
+    :root {
+      --bg: #FBF7F2;
+      --card: #FFFFFF;
+      --text: #2C2C2C;
+      --muted: #7A6F66;
+      --hint: #B5A69C;
+      --warm: #E8A87C;
+      --green: #9DC6B0;
+      --blue: #6BA3C9;
+      --chip: #F5E6DD;
+      --line: #EDE8E2;
+      --shadow: 0 12px 40px rgba(140, 120, 100, 0.08);
+      --glass: rgba(255, 255, 255, 0.72);
+      --btn: rgba(255, 255, 255, 0.75);
+      --modal: #FFFFFF;
+      --struct-bg: rgba(232, 168, 124, 0.28);
+      --struct-fg: #C47A45;
+      --colloc-color: #3D8B6E;
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    [data-theme="dark"] {
+      --bg: #1A1A1E;
+      --card: rgba(36, 36, 42, 0.92);
+      --text: #F0EDE8;
+      --muted: #B5A8A0;
+      --hint: #7A6F66;
+      --chip: #3A2E2A;
+      --line: #2E2E34;
+      --shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      --glass: rgba(24, 24, 28, 0.75);
+      --btn: rgba(40, 40, 48, 0.85);
+      --modal: #2A2A30;
+      --struct-bg: rgba(232, 168, 124, 0.22);
+      --struct-fg: #F0B888;
+      --colloc-color: #9DC6B0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: "SF Pro Display", "PingFang SC", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: #E5DDD4;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+      color: var(--text);
+    }
+
+    .phone {
+      width: 100%;
+      max-width: 390px;
+      height: min(844px, 100vh - 24px);
+      background: var(--bg);
+      border-radius: 36px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18);
+      display: flex;
+      flex-direction: column;
+      transition: background 0.3s;
+    }
+
+    @media (max-width: 430px) {
+      body { padding: 0; background: var(--bg); }
+      .phone { max-width: 100%; height: 100vh; border-radius: 0; box-shadow: none; }
+    }
+
+    .status-bar {
+      height: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 22px 0;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+
+    .theme-btn {
+      border: none;
+      background: var(--btn);
+      color: var(--text);
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+
+    .page { display: none; flex: 1; min-height: 0; flex-direction: column; }
+    .page.active { display: flex; }
+
+    .home-top {
+      margin: 8px 16px 0;
+      padding: 10px 14px;
+      border-radius: 16px;
+      background: var(--glass);
+      backdrop-filter: blur(16px);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: var(--muted);
+      box-shadow: var(--shadow);
+      z-index: 5;
+      flex-shrink: 0;
+      gap: 8px;
+    }
+    .home-top .warm { color: var(--warm); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+      .legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 8px 16px 0;
+      font-size: 11px;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .legend span { display: inline-flex; align-items: center; gap: 4px; }
+    .lg-struct {
+      display: inline-block;
+      padding: 0 4px;
+      border-radius: 3px;
+      background: var(--struct-bg);
+      color: var(--struct-fg);
+      font-weight: 700;
+      font-size: 10px;
+      border-bottom: 2px solid var(--struct-fg);
+    }
+    .lg-colloc {
+      display: inline-block;
+      border-bottom: 2px solid var(--colloc-color);
+      color: var(--colloc-color);
+      font-weight: 700;
+      line-height: 1;
+      padding-bottom: 1px;
+    }
+
+    .feed {
+      flex: 1;
+      overflow-y: auto;
+      scroll-snap-type: y mandatory;
+      -webkit-overflow-scrolling: touch;
+      padding-bottom: 12px;
+    }
+    .feed::-webkit-scrollbar { display: none; }
+
+    .slide {
+      min-height: 100%;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
+      padding: 12px 16px 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 20px 18px 16px;
+      box-shadow: var(--shadow);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 12px; }
+    .tag {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: var(--chip);
+      color: var(--warm);
+    }
+    .tag.logic { background: rgba(157, 198, 176, 0.25); color: #5a9a7e; }
+    .tag.grammar { background: rgba(107, 163, 201, 0.2); color: #4a7fa0; }
+    .tag.scene { background: rgba(232, 168, 124, 0.18); color: var(--warm); }
+    [data-theme="dark"] .tag.logic { color: var(--green); }
+    [data-theme="dark"] .tag.grammar { color: #8ec0df; }
+
+    .reply-meta {
+      font-size: 11px;
+      color: var(--hint);
+      line-height: 1.45;
+      margin: 0 0 10px;
+      font-weight: 500;
+    }
+    .reply-meta b {
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    .who {
+      font-size: 12px;
+      color: var(--hint);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .who.reply-who { margin-top: 2px; margin-bottom: 2px; }
+
+    .en-line {
+      font-size: 20px;
+      font-weight: 700;
+      line-height: 1.55;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .cn {
+      font-size: 13px;
+      color: var(--hint);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    /* 可点单词 */
+    .w {
+      cursor: pointer;
+      border-radius: 4px;
+      padding: 0 1px;
+      transition: background 0.15s;
+    }
+    .w:active, .w.active { background: rgba(107, 163, 201, 0.25); }
+
+    /* 句子主干：只标谓语核心，少量色块 */
+    .struct {
+      background: var(--struct-bg);
+      color: var(--struct-fg);
+      border-radius: 4px;
+      padding: 0 3px;
+      font-weight: 800;
+      border-bottom: 2px solid var(--struct-fg);
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+
+    /* 固定搭配：绿色下划线，不加整句底色 */
+    .colloc {
+      color: var(--colloc-color);
+      font-weight: 700;
+      border-bottom: 2px dashed var(--colloc-color);
+      padding-bottom: 1px;
+      text-decoration: none;
+      background: transparent;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px dashed var(--line);
+      margin: 4px 0 12px;
+    }
+
+    .reveal-box {
+      background: rgba(232, 168, 124, 0.08);
+      border-radius: 16px;
+      padding: 12px 14px;
+      margin-bottom: 12px;
+      cursor: pointer;
+    }
+    .reveal-hint {
+      text-align: center;
+      color: var(--warm);
+      font-size: 14px;
+      font-weight: 600;
+      padding: 16px 0;
+    }
+    .reveal-content { display: none; }
+    .reveal-box.open .reveal-hint { display: none; }
+    .reveal-box.open .reveal-content { display: block; }
+    .reveal-box.open { cursor: default; }
+
+    /* 双拆解面板 */
+    .break-panels { margin-top: auto; display: flex; flex-direction: column; gap: 8px; }
+    .break-panel {
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+      background: rgba(0,0,0,0.01);
+    }
+    .break-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      cursor: pointer;
+      user-select: none;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .break-head.grammar { color: #4a7fa0; }
+    .break-head.logic { color: #5a9a7e; }
+    [data-theme="dark"] .break-head.grammar { color: #8ec0df; }
+    [data-theme="dark"] .break-head.logic { color: var(--green); }
+    .break-head .arrow { font-size: 11px; transition: transform 0.25s; color: var(--hint); }
+    .break-head .arrow.open { transform: rotate(180deg); }
+    .break-body {
+      max-height: 0;
+      overflow: hidden;
+      opacity: 0;
+      transition: max-height 0.35s ease, opacity 0.25s;
+      padding: 0 12px;
+    }
+    .break-body.open {
+      max-height: 720px;
+      opacity: 1;
+      padding-bottom: 12px;
+    }
+
+    .slot {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      background: var(--chip);
+      color: var(--text);
+      padding: 10px 12px;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+    .slot-label {
+      font-size: 11px;
+      color: var(--hint);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+    .g-item, .l-item {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.45;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      gap: 8px;
+    }
+    .g-item {
+      flex-direction: column;
+      gap: 4px;
+    }
+    .g-item:last-child, .l-item:last-child { border-bottom: none; }
+    .g-item .k {
+      flex-shrink: 0;
+      font-size: 12px;
+      font-weight: 800;
+      color: #4a7fa0;
+      background: none;
+      padding: 0;
+      border-radius: 0;
+      height: auto;
+      margin-top: 0;
+    }
+    .g-rows { display: flex; flex-direction: column; gap: 2px; }
+    .g-row {
+      font-size: 12px;
+      line-height: 1.4;
+      color: var(--muted);
+    }
+    .g-row em {
+      font-style: normal;
+      font-weight: 700;
+      color: var(--hint);
+      margin-right: 4px;
+      font-size: 11px;
+    }
+    .l-item .n {
+      flex-shrink: 0;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: rgba(157, 198, 176, 0.3);
+      color: #5a9a7e;
+      display: grid;
+      place-items: center;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 12px;
+      flex-shrink: 0;
+    }
+    .act {
+      min-width: 64px;
+      border: 1.5px solid var(--warm);
+      background: rgba(232, 168, 124, 0.06);
+      color: var(--warm);
+      border-radius: 999px;
+      padding: 9px 12px;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: 11px;
+    }
+    .act .ico { font-size: 17px; line-height: 1; }
+    .act:active { transform: scale(0.95); }
+    .act.fav.on { border-color: #F5B342; color: #F5B342; background: rgba(245, 179, 66, 0.12); }
+    .swipe-tip { text-align: center; font-size: 11px; color: var(--hint); margin-top: 8px; }
+
+    .scroll-page {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 16px 24px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .scroll-page::-webkit-scrollbar { display: none; }
+    .page-title { font-size: 22px; font-weight: 800; margin: 8px 0 14px; }
+    .search {
+      width: 100%;
+      border: none;
+      outline: none;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      border-radius: 16px;
+      padding: 12px 16px;
+      font-size: 14px;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+    .search::placeholder { color: var(--hint); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+    .chip {
+      border: none;
+      background: var(--card);
+      color: var(--muted);
+      font-size: 12px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+    }
+    .chip.on { background: var(--warm); color: #fff; }
+
+    .freq-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .freq-chip {
+      flex: 1;
+      border: 1.5px solid var(--line);
+      background: var(--card);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      padding: 10px 6px;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .freq-chip small {
+      display: block;
+      font-size: 10px;
+      font-weight: 500;
+      margin-top: 2px;
+      opacity: 0.85;
+    }
+    .freq-chip.on {
+      border-color: var(--warm);
+      background: rgba(232, 168, 124, 0.15);
+      color: var(--struct-fg);
+    }
+    .freq-chip.on[data-freq="high"] {
+      border-color: var(--blue);
+      background: rgba(107, 163, 201, 0.15);
+      color: #4a7fa0;
+    }
+    .freq-chip.on[data-freq="advanced"] {
+      border-color: var(--green);
+      background: rgba(157, 198, 176, 0.2);
+      color: #5a9a7e;
+    }
+    .freq-hint {
+      font-size: 12px;
+      color: var(--muted);
+      background: var(--chip);
+      border-radius: 12px;
+      padding: 8px 12px;
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .freq-hint strong { color: var(--warm); }
+
+    .section-label {
+      font-size: 11px;
+      color: var(--hint);
+      font-weight: 600;
+      margin: 4px 0 8px;
+      letter-spacing: 0.3px;
+    }
+
+    .sub-tabs {
+      display: flex;
+      gap: 20px;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 16px;
+    }
+    .sub-tab {
+      border: none;
+      background: none;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--hint);
+      padding-bottom: 10px;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+    .sub-tab.on { color: var(--text); border-bottom-color: var(--warm); }
+    .struct-card {
+      background: var(--card);
+      border-radius: 22px;
+      padding: 16px;
+      box-shadow: var(--shadow);
+      margin-bottom: 12px;
+      cursor: pointer;
+      position: relative;
+    }
+    .struct-card.locked {
+      opacity: 0.72;
+      cursor: not-allowed;
+    }
+    .struct-card.locked::after {
+      content: '🔒 先完成超高频';
+      position: absolute;
+      right: 14px;
+      top: 14px;
+      font-size: 11px;
+      color: var(--hint);
+      font-weight: 600;
+    }
+    .struct-card .card-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .struct-card h3 { font-size: 16px; font-weight: 700; flex: 1; }
+    .freq-badge {
+      flex-shrink: 0;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 999px;
+    }
+    .freq-badge.ultra { background: rgba(232, 168, 124, 0.25); color: #C47A45; }
+    .freq-badge.high { background: rgba(107, 163, 201, 0.22); color: #4a7fa0; }
+    .freq-badge.advanced { background: rgba(157, 198, 176, 0.3); color: #5a9a7e; }
+    .struct-card p { font-size: 13px; color: var(--muted); line-height: 1.45; margin-bottom: 10px; }
+    .struct-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--hint);
+    }
+    .struct-meta .go { color: var(--warm); font-weight: 700; }
+    .progress-mini {
+      height: 6px;
+      background: var(--line);
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 8px 0 4px;
+    }
+    .progress-mini span { display: block; height: 100%; background: var(--warm); border-radius: 99px; }
+
+    .castle {
+      background: linear-gradient(135deg, #F5E6DD 0%, #E0EEE8 100%);
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+      color: #2C2C2C;
+    }
+    [data-theme="dark"] .castle {
+      background: linear-gradient(135deg, #3A2E2A 0%, #2A3A34 100%);
+      color: var(--text);
+    }
+    .castle h2 { font-size: 18px; font-weight: 800; margin-bottom: 14px; }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .stats .num { font-size: 22px; font-weight: 800; color: var(--warm); }
+    .stats .lab { font-size: 11px; color: var(--muted); margin-top: 2px; }
+    .bar {
+      height: 8px;
+      background: rgba(255,255,255,0.45);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+    .bar i { display: block; height: 100%; width: 28%; background: var(--warm); border-radius: 99px; }
+    .bar-cap { font-size: 11px; color: var(--muted); text-align: right; margin-top: 6px; }
+    .grid3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .mini {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 14px 8px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+    .mini .ico { font-size: 22px; }
+    .mini .lab { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .mini .badge { font-size: 12px; color: var(--warm); font-weight: 700; margin-top: 2px; }
+    .list {
+      background: var(--card);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .list-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 15px 18px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .list-item:last-child { border-bottom: none; }
+    .list-item .r { color: var(--hint); }
+    .sub-cta {
+      margin-top: 16px;
+      background: var(--warm);
+      color: #fff;
+      border: none;
+      width: 100%;
+      border-radius: 999px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tabbar {
+      flex-shrink: 0;
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 calc(10px + var(--safe-bottom));
+      background: var(--glass);
+      backdrop-filter: blur(18px);
+      border-top: 1px solid var(--line);
+    }
+    .tab {
+      border: none;
+      background: none;
+      color: var(--hint);
+      font-size: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      cursor: pointer;
+      padding: 0 12px;
+    }
+    .tab .ico { font-size: 20px; }
+    .tab.on { color: var(--warm); }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(30, 28, 26, 0.35);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 50;
+    }
+    .overlay.show { display: flex; }
+    .drawer {
+      width: 100%;
+      background: var(--modal);
+      border-radius: 28px 28px 0 0;
+      padding: 14px 20px calc(20px + var(--safe-bottom));
+      animation: up 0.3s ease;
+    }
+    @keyframes up {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    .handle {
+      width: 40px;
+      height: 4px;
+      background: var(--line);
+      border-radius: 99px;
+      margin: 0 auto 14px;
+    }
+    .drawer h3 { font-size: 17px; margin-bottom: 10px; }
+    .drawer textarea {
+      width: 100%;
+      min-height: 100px;
+      border: none;
+      resize: vertical;
+      background: var(--bg);
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 14px;
+      font-family: inherit;
+      color: var(--text);
+      outline: none;
+    }
+    .drawer .hint { font-size: 12px; color: var(--hint); margin: 8px 0 12px; }
+    .drawer .save {
+      width: 100%;
+      border: none;
+      background: var(--warm);
+      color: #fff;
+      border-radius: 999px;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    /* 单词弹层 */
+    .word-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(30, 28, 26, 0.4);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 70;
+      padding: 24px;
+    }
+    .word-overlay.show { display: flex; }
+    .word-card {
+      width: 100%;
+      max-width: 320px;
+      background: var(--modal);
+      border-radius: 24px;
+      padding: 22px 20px 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      animation: pop 0.25s ease;
+    }
+    @keyframes pop {
+      from { transform: scale(0.94); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+    .word-card .word-head {
+      font-size: 26px;
+      font-weight: 800;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .word-card .ipa {
+      font-size: 14px;
+      color: var(--blue);
+      font-family: Georgia, "Times New Roman", serif;
+      margin-bottom: 14px;
+    }
+    .word-card .row {
+      margin-bottom: 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: var(--bg);
+    }
+    .word-card .row .lab {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--hint);
+      margin-bottom: 4px;
+      letter-spacing: 0.3px;
+    }
+    .word-card .row .val {
+      font-size: 15px;
+      color: var(--text);
+      line-height: 1.45;
+    }
+    .word-card .row.ctx {
+      background: rgba(232, 168, 124, 0.12);
+      border: 1px solid rgba(232, 168, 124, 0.35);
+    }
+    .word-card .close-word {
+      width: 100%;
+      margin-top: 6px;
+      border: none;
+      background: var(--warm);
+      color: #fff;
+      border-radius: 999px;
+      padding: 11px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .toast {
+      position: absolute;
+      left: 50%;
+      bottom: 96px;
+      transform: translateX(-50%) translateY(12px);
+      background: rgba(44, 44, 44, 0.9);
+      color: #fff;
+      font-size: 13px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.25s;
+      z-index: 80;
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* 副图鉴：语法 / 词汇 */
+    .atlas-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .atlas-card {
+      background: var(--card);
+      border-radius: 18px;
+      padding: 14px 12px;
+      box-shadow: var(--shadow);
+      cursor: pointer;
+    }
+    .atlas-card:active { transform: scale(0.98); }
+    .atlas-card .at-title {
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .atlas-card .at-num {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--warm);
+    }
+    .atlas-card .at-num span { font-size: 13px; color: var(--hint); font-weight: 600; }
+    .atlas-card .at-sub {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+    .atlas-card.grammar .at-num { color: #4a7fa0; }
+    .atlas-card.vocab .at-num { color: #5a9a7e; }
+    .stats-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed rgba(0,0,0,0.08);
+    }
+    [data-theme="dark"] .stats-2 { border-top-color: rgba(255,255,255,0.1); }
+    .stats-2 .s2 {
+      text-align: center;
+    }
+    .stats-2 .s2 .n { font-size: 18px; font-weight: 800; color: var(--warm); }
+    .stats-2 .s2 .l { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+    .atlas-drawer .atlas-list {
+      max-height: 52vh;
+      overflow-y: auto;
+      margin: 8px 0 12px;
+      -webkit-overflow-scrolling: touch;
+    }
+    .atlas-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 4px;
+      border-bottom: 1px solid var(--line);
+      font-size: 13px;
+    }
+    .atlas-item:last-child { border-bottom: none; }
+    .atlas-item .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-top: 5px;
+      flex-shrink: 0;
+      background: var(--line);
+    }
+    .atlas-item.seen .dot { background: var(--blue); }
+    .atlas-item.mastered .dot { background: var(--green); }
+    .atlas-item .meta { flex: 1; min-width: 0; }
+    .atlas-item .name { font-weight: 700; color: var(--text); }
+    .atlas-item .desc { color: var(--muted); font-size: 12px; margin-top: 2px; line-height: 1.35; }
+    .atlas-item .st {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--hint);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .atlas-item.mastered .st { color: #5a9a7e; }
+    .atlas-item.seen .st { color: #4a7fa0; }
+    .atlas-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+    .atlas-tabs button {
+      flex: 1;
+      border: none;
+      background: var(--bg);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .atlas-tabs button.on {
+      background: rgba(232, 168, 124, 0.2);
+      color: var(--warm);
+    }
+    .atlas-sec {
+      margin: 4px 0 14px;
+    }
+    .atlas-sec:last-child { margin-bottom: 4px; }
+    .atlas-sec-h {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 6px 2px 8px;
+      position: sticky;
+      top: 0;
+      background: var(--modal);
+      z-index: 1;
+    }
+    .atlas-sec-h .sec-name {
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: 0.02em;
+    }
+    .atlas-sec-h .sec-name small {
+      font-weight: 600;
+      color: var(--hint);
+      font-size: 11px;
+      margin-left: 6px;
+    }
+    .atlas-sec-h .sec-prog {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--muted);
+      flex-shrink: 0;
+    }
+    .atlas-sec-bar {
+      height: 3px;
+      background: var(--line);
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 0 2px 6px;
+    }
+    .atlas-sec-bar > i {
+      display: block;
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, var(--blue), var(--green));
+      border-radius: 99px;
+    }
+    .atlas-item .link {
+      color: var(--hint);
+      font-size: 11px;
+      margin-top: 3px;
+      line-height: 1.3;
+    }
+    .atlas-item.later {
+      opacity: 0.55;
+    }
+    .atlas-item.later .st { color: var(--hint); }
+    .atlas-empty {
+      color: var(--hint);
+      font-size: 13px;
+      padding: 16px 4px;
+      text-align: center;
+      line-height: 1.45;
+    }
+    .note-cap {
+      font-size: 11px;
+      color: var(--hint);
+      line-height: 1.4;
+      margin: -4px 0 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="phone" id="app" data-theme="light">
+    <div class="status-bar">
+      <span>英语挖呀挖</span>
+      <button class="theme-btn" id="themeBtn" type="button">深色</button>
+    </div>
+
+    <section class="page active" id="page-home">
+      <div class="home-top">
+        <span>今日 <span class="warm" id="todayCount">0</span>/10</span>
+        <span>点亮 <span class="warm" id="litCount">2</span>/20 · <span id="streak">3</span>天</span>
+      </div>
+      <div class="legend">
+        <span><i class="lg-struct">主干</i> 谓语/句核</span>
+        <span><i class="lg-colloc">搭配</i> 固定短语</span>
+        <span>点词查音标</span>
+      </div>
+      <div class="feed" id="feed"></div>
+    </section>
+
+    <section class="page" id="page-discover">
+      <div class="scroll-page">
+        <h1 class="page-title">发现</h1>
+        <input class="search" type="search" placeholder="搜索句型 / 逻辑 / 场景…" id="searchInput">
+
+        <div class="section-label">按频率学（小白从超高频开始）</div>
+        <div class="freq-row" id="freqChips">
+          <button class="freq-chip on" data-freq="ultra" type="button">超高频<small>先学这些</small></button>
+          <button class="freq-chip" data-freq="high" type="button">高频<small>打牢基础后</small></button>
+          <button class="freq-chip" data-freq="advanced" type="button">进阶<small>再往上走</small></button>
+        </div>
+        <div class="freq-hint" id="freqHint">建议小白先刷完 <strong>超高频</strong>，再解锁高频与进阶。</div>
+
+        <div class="section-label">可选筛选 · 角色（非必选）</div>
+        <div class="chips" id="roleChips">
+          <button class="chip on" data-role="all" type="button">全部角色</button>
+          <button class="chip" data-role="发起" type="button">发起</button>
+          <button class="chip" data-role="接话" type="button">接话</button>
+          <button class="chip" data-role="互动" type="button">互动</button>
+          <button class="chip" data-role="汇报" type="button">汇报</button>
+        </div>
+
+        <div class="sub-tabs">
+          <button class="sub-tab on" data-panel="patterns" type="button">句型结构</button>
+          <button class="sub-tab" data-panel="logics" type="button">段落逻辑</button>
+        </div>
+        <div id="panel-patterns"></div>
+        <div id="panel-logics" style="display:none;"></div>
+      </div>
+    </section>
+
+    <section class="page" id="page-profile">
+      <div class="scroll-page">
+        <h1 class="page-title">我的</h1>
+        <div class="castle">
+          <h2>结构图鉴（主进度）</h2>
+          <div class="stats">
+            <div><div class="num" id="statPattern">2</div><div class="lab">句型点亮</div></div>
+            <div><div class="num" id="statLogic">1</div><div class="lab">逻辑点亮</div></div>
+            <div><div class="num" id="statFav">0</div><div class="lab">收藏</div></div>
+          </div>
+          <div class="bar"><i id="overallBar"></i></div>
+          <div class="bar-cap">阶段 1 · 目标 20 句型 / 6 逻辑</div>
+          <div class="stats-2">
+            <div class="s2"><div class="n" id="statGrammar">0<span style="font-size:12px;font-weight:600;color:inherit;opacity:.7">/50</span></div><div class="l">语法点 · 见过</div></div>
+            <div class="s2"><div class="n" id="statVocab">0<span style="font-size:12px;font-weight:600;color:inherit;opacity:.7">/200</span></div><div class="l">职场词 · 见过</div></div>
+          </div>
+        </div>
+
+        <p class="note-cap">语法与词汇是刷对话对时<strong>顺带点亮</strong>的副图鉴，不是另开课。展开语法拆解 / 点查单词即计入。</p>
+
+        <div class="atlas-grid">
+          <div class="atlas-card grammar" id="btnGrammarAtlas">
+            <div class="at-title">📖 语法地图</div>
+            <div class="at-num" id="atlasGrammarNum">0<span> / 50</span></div>
+            <div class="at-sub" id="atlasGrammarSub">掌握 0 · 见过 0 · 未遇 50</div>
+          </div>
+          <div class="atlas-card vocab" id="btnVocabAtlas">
+            <div class="at-title">🎒 词汇袋</div>
+            <div class="at-num" id="atlasVocabNum">0<span> / 200</span></div>
+            <div class="at-sub" id="atlasVocabSub">点查 0 · IT词 0 · 阶段目标 200</div>
+          </div>
+        </div>
+
+        <div class="grid3">
+          <div class="mini" id="btnFavs"><div class="ico">⭐</div><div class="lab">我的收藏</div><div class="badge" id="favBadge">0</div></div>
+          <div class="mini" id="btnNotes"><div class="ico">📝</div><div class="lab">笔记</div><div class="badge">—</div></div>
+          <div class="mini"><div class="ico">🎯</div><div class="lab">今日目标</div><div class="badge">10 条</div></div>
+        </div>
+        <div class="list">
+          <div class="list-item"><span>朗读音色</span><span class="r">系统默认 ›</span></div>
+          <div class="list-item" id="btnThemeRow"><span>外观主题</span><span class="r" id="themeLabel">浅色 ›</span></div>
+          <div class="list-item"><span>关于英语挖呀挖</span><span class="r">›</span></div>
+        </div>
+        <button class="sub-cta" id="btnSub" type="button">开通年费会员 ¥99 · 解锁完整图鉴</button>
+      </div>
+    </section>
+
+    <nav class="tabbar">
+      <button class="tab on" data-page="page-home" type="button"><span class="ico">🏠</span>首页</button>
+      <button class="tab" data-page="page-discover" type="button"><span class="ico">🔍</span>发现</button>
+      <button class="tab" data-page="page-profile" type="button"><span class="ico">👤</span>我的</button>
+    </nav>
+
+    <div class="overlay" id="overlay">
+      <div class="drawer">
+        <div class="handle"></div>
+        <h3>写一句：这个结构你打算怎么用？</h3>
+        <textarea id="noteInput" placeholder="例如：周报里解释 delay 时套「结论→原因→方案」…"></textarea>
+        <div class="hint">仅本地演示</div>
+        <button class="save" id="saveNote" type="button">保存</button>
+      </div>
+    </div>
+
+    <div class="word-overlay" id="wordOverlay">
+      <div class="word-card" id="wordCard">
+        <div class="word-head" id="wordHead">word</div>
+        <div class="ipa" id="wordIpa">/…/</div>
+        <div class="row">
+          <div class="lab">词典义</div>
+          <div class="val" id="wordDict">—</div>
+        </div>
+        <div class="row ctx">
+          <div class="lab">在本句中的意思</div>
+          <div class="val" id="wordCtx">—</div>
+        </div>
+        <button class="close-word" id="closeWord" type="button">知道了</button>
+      </div>
+    </div>
+
+    <div class="overlay" id="atlasOverlay">
+      <div class="drawer atlas-drawer">
+        <div class="handle"></div>
+        <h3 id="atlasTitle">语法地图</h3>
+        <p class="hint" id="atlasHint" style="margin-top:-4px;margin-bottom:8px;">见过 = 展开过语法拆解；掌握 = 在 ≥2 条对话里见过</p>
+        <div class="atlas-tabs" id="atlasTabs"></div>
+        <div class="atlas-list" id="atlasList"></div>
+        <button class="save" id="closeAtlas" type="button">关闭</button>
+      </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+  </div>
+
+  <script>
+    (function () {
+      /**
+       * tokens:
+       *   struct = 句子主干（主语+谓语核心，少量标记）
+       *   colloc = 固定搭配（短语级，少量标记）
+       * grammar = 语法现象说明（时态变形、形式主语、虚拟等）
+       * logic = 段落表达逻辑
+       */
+      const FREQ_LABEL = { ultra: '超高频', high: '高频', advanced: '进阶' };
+
+      /** 阶段目标：语法点封顶 50；词汇阶段目标 200 */
+      const GRAMMAR_GOAL = 50;
+      const VOCAB_GOAL = 200;
+
+      /**
+       * 语法地图：按「从动词形态 → 句子骨架 → 语气 → 从句 → 语态」教学顺序分区。
+       * 区内条目固定排序（地图坐标不随进度跳动）；进度只改变点亮状态。
+       * patternIds = 挂靠的句型（结构为主、语法为辅的交叉索引）
+       * stage: now = 当前对话已覆盖；later = 后续句型预留
+       */
+      const GRAMMAR_CAT_ORDER = ['时态', '句式', '非谓语', '语气', '从句', '语态'];
+      const GRAMMAR_CAT_BLURB = {
+        '时态': '把动作放在时间线上',
+        '句式': '句子怎么搭骨架',
+        '非谓语': '动词不当谓语时怎么用',
+        '语气': '软硬、礼貌、情态',
+        '从句': '把原因/目的/条件接上',
+        '语态': '强调承受方或状态'
+      };
+
+      const GRAMMAR_ATLAS = [
+        { id: 'g_past_simple', name: '一般过去 had/V-ed', cat: '时态', order: 1, stage: 'now', patternIds: ['p2'], desc: '已发生的客观事实用过去时' },
+        { id: 'g_did_emph', name: 'did + 原形强调', cat: '时态', order: 2, stage: 'now', patternIds: ['p2'], desc: '助动词 did 后接原形，强调「确实做过」' },
+        { id: 'g_pres_perf', name: '现在完成 have + V-ed', cat: '时态', order: 3, stage: 'now', patternIds: ['p2'], desc: '过去动作对现在仍有影响' },
+        { id: 'g_will', name: 'will + 原形', cat: '时态', order: 4, stage: 'now', patternIds: ['p2', 'p7'], desc: '将来承诺/预测，will 后用原形' },
+        { id: 'g_linking', name: '系表结构 S + be + C', cat: '句式', order: 1, stage: 'now', patternIds: ['p1'], desc: '用 is/are 说明「是什么」' },
+        { id: 'g_formal_it', name: '形式主语 It', cat: '句式', order: 2, stage: 'now', patternIds: ['p1'], desc: 'It is adj. to do…，真正主语是 to do' },
+        { id: 'g_there_be', name: 'There is/are', cat: '句式', order: 3, stage: 'later', patternIds: ['p5'], desc: '存在句，描述现场/问题' },
+        { id: 'g_to_inf', name: '不定式 to + 原形', cat: '非谓语', order: 1, stage: 'now', patternIds: ['p1'], desc: 'to 后必须用动词原形' },
+        { id: 'g_modal_bare', name: '情态 + 原形', cat: '语气', order: 1, stage: 'now', patternIds: ['p3'], desc: 'can/could/will/should 后一律接原形' },
+        { id: 'g_could_polite', name: 'Could 表委婉', cat: '语气', order: 2, stage: 'now', patternIds: ['p3'], desc: 'Could you… 比 Can 更礼貌；这里是礼貌，不是 If I were 虚拟' },
+        { id: 'g_wish', name: '虚拟 I wish / If I were', cat: '语气', order: 3, stage: 'later', patternIds: ['p13'], desc: '愿望与非真实假设' },
+        { id: 'g_so_that', name: 'so that 目的状语', cat: '从句', order: 1, stage: 'now', patternIds: ['p3'], desc: '说明「为了什么」' },
+        { id: 'g_because', name: 'because / due to', cat: '从句', order: 2, stage: 'later', patternIds: ['p6'], desc: '说明原因的两种常用接法' },
+        { id: 'g_if_real', name: '真实条件 If…will', cat: '从句', order: 3, stage: 'later', patternIds: ['p9'], desc: '可能实现的假设：如果…就会…' },
+        { id: 'g_passive', name: '被动 be + V-ed', cat: '语态', order: 1, stage: 'now', patternIds: ['p12'], desc: '强调承受方或状态，如 is delayed' }
+      ];
+
+      const STOP_WORDS = new Set(['the','a','an','and','or','of','to','in','on','at','for','is','are','was','were','be','we','you','i','it','this','that','my','your']);
+
+      const patterns = [
+        { id: 'p1', name: 'It is + adj. + to do', desc: '评价难易/重要性，开口超常用', done: 2, total: 4, roles: ['汇报', '接话'], freq: 'ultra' },
+        { id: 'p2', name: 'did + V / have already + V-ed', desc: '强调完成 + 现在完成补救', done: 1, total: 4, roles: ['接话', '汇报'], freq: 'ultra' },
+        { id: 'p3', name: 'Could you… so that…', desc: '礼貌请求并说明目的', done: 0, total: 3, roles: ['发起', '互动'], freq: 'ultra' },
+        { id: 'p5', name: 'There is / There are', desc: '存在句，描述现场/问题', done: 0, total: 3, roles: ['汇报', '发起'], freq: 'ultra' },
+        { id: 'p6', name: 'because / due to', desc: '说明原因的两种常用接法', done: 0, total: 3, roles: ['接话', '汇报'], freq: 'ultra' },
+        { id: 'p7', name: 'will + V / be going to', desc: '计划与承诺', done: 0, total: 3, roles: ['汇报', '发起'], freq: 'ultra' },
+        { id: 'p8', name: 'I think / I believe…', desc: '温和提出观点', done: 0, total: 3, roles: ['互动', '汇报'], freq: 'ultra' },
+        { id: 'p4', name: 'I appreciate… / without…', desc: '接受认可并归功他人', done: 0, total: 3, roles: ['接话'], freq: 'high' },
+        { id: 'p9', name: 'If…, … will…', desc: '真实条件：如果…就会…', done: 0, total: 3, roles: ['汇报', '互动'], freq: 'high' },
+        { id: 'p10', name: 'Would you mind…?', desc: '更委婉的请求', done: 0, total: 3, roles: ['发起'], freq: 'high' },
+        { id: 'p11', name: 'not only… but also…', desc: '递进并列，让表达更饱满', done: 0, total: 2, roles: ['汇报'], freq: 'high' },
+        { id: 'p12', name: 'be + V-ed（被动）', desc: '强调动作承受方，会议纪要常用', done: 0, total: 3, roles: ['汇报'], freq: 'advanced' },
+        { id: 'p13', name: 'I wish / If I were…', desc: '虚拟语气，表达愿望或假设', done: 0, total: 2, roles: ['互动'], freq: 'advanced' }
+      ];
+
+      const logics = [
+        { id: 'l1', name: '结论 → 原因 → 方案', desc: '先给确定性，再解释，最后落地', done: 1, total: 4, roles: ['接话', '汇报'], freq: 'ultra' },
+        { id: 'l2', name: '承认 → 归因 → 补救', desc: '被质疑时稳住局面', done: 1, total: 4, roles: ['接话'], freq: 'ultra' },
+        { id: 'l3', name: '先肯后议', desc: '先接住对方，再提不同意见', done: 0, total: 3, roles: ['互动', '发起'], freq: 'high' },
+        { id: 'l4', name: '现状 → 影响 → 求助', desc: '求助时把背景说清', done: 0, total: 3, roles: ['发起'], freq: 'high' },
+        { id: 'l5', name: 'STAR（情境-任务-行动-结果）', desc: '面试/述职讲故事', done: 0, total: 2, roles: ['汇报'], freq: 'advanced' }
+      ];
+
+      const W = (w, key) => ({ t: 'word', w, key: key || w.toLowerCase().replace(/[^a-z']/g, '') });
+      const T = (s) => ({ t: 'text', w: s });
+      const S = (...kids) => ({ t: 'struct', kids }); // 主干
+      const C = (...kids) => ({ t: 'colloc', kids }); // 搭配
+
+      const dialogues = [
+        {
+          id: 'd1',
+          scene: '站会 · IT',
+          role: '接话',
+          patternId: 'p2',
+          patternName: 'did + V / have already + V-ed',
+          logicId: 'l2',
+          logicName: '承认 → 归因 → 补救',
+          grammarTag: '强调过去 · 现在完成 · will',
+          otherTokens: [
+            W('Why'), T(' '), S(W('is')), T(' '), W('this'), T(' '), W('task'), T(' '), W('delayed'), T('?')
+          ],
+          otherCn: '这个任务为什么延期了？',
+          // 只标主干谓语 + 少量搭配，其余保持普通文字
+          replyTokens: [
+            W('We'), T(' '), S(W('did'), T(' '), W('finish')), T(' '), W('the'), T(' '), W('code'),
+            T(', but the '), C(W('staging'), T(' '), W('environment')), T(' '), S(W('had')), T(' '), C(W('a'), T(' '), W('config'), T(' '), W('issue')),
+            T('. '), W("We've"), T(' '), W('already'), T(' '), S(W('fixed')), T(' '), W('it'),
+            T(', and the '), W('deploy'), T(' '), S(W('will'), T(' '), W('complete')), T(' '), W('in'), T(' '), W('30'), T(' '), W('minutes'), T('.')
+          ],
+          replyCn: '代码确实写完了，但测试环境有配置问题。我们已经修好了，30 分钟内完成部署。',
+          grammarIds: ['g_did_emph', 'g_past_simple', 'g_pres_perf', 'g_will', 'g_passive'],
+          grammar: {
+            stem: 'did finish → had → have fixed → will complete',
+            lens: '英语语法先回答：这件事相对「现在」处在哪——过去事实、现在结果、还是未来承诺。',
+            items: [
+              {
+                k: 'is delayed（状态，不是谁延迟）',
+                essence: '英语常说「事物处于什么状态」，不一定点名施事者。',
+                when: '关心任务现在卡着，不关心是谁 delay 的。',
+                form: 'be + V-ed → is delayed'
+              },
+              {
+                k: 'did finish / had（过去已发生）',
+                essence: '一般过去 = 把事件钉在过去时间线上，当「已发生事实」报出。did 只是把时态/强调交给助动词，实义动词保持原形。',
+                when: '承认「代码写完了」「当时出过配置问题」——事实在过去，不强调现在还连着。',
+                form: 'did + 原形；had / V-ed'
+              },
+              {
+                k: "We've fixed（过去动作 → 现在结果）",
+                essence: '现在完成 = 动作发生在过去，但说话人要的是它对现在的影响。',
+                when: '修已经完成，所以现在可以继续部署——结果对现在有用。',
+                form: 'have/has + V-ed'
+              },
+              {
+                k: 'will complete（未来承诺）',
+                essence: 'will = 说话人对尚未发生之事的投影（承诺/预测）。',
+                when: '给出接下来会发生什么、何时落地。',
+                form: 'will + 原形'
+              }
+            ]
+          },
+          logic: {
+            slot: '承认事实 → 归因客观 → 给出方案与时间',
+            steps: [
+              '承认：We did finish the code（不推诿）',
+              '归因：staging environment / config issue（不甩锅到人）',
+              '补救：already fixed + 30 minutes（给确定性）'
+            ]
+          },
+          words: {
+            why: { ipa: '/waɪ/', dict: 'adv. 为什么', ctx: '引出质问原因' },
+            is: { ipa: '/ɪz/', dict: 'v. be 第三人称单数', ctx: '构成被动状态：is delayed' },
+            this: { ipa: '/ðɪs/', dict: 'pron. 这个', ctx: '指当前任务' },
+            task: { ipa: '/tɑːsk/', dict: 'n. 任务', ctx: '开发工单/任务', it: true },
+            delayed: { ipa: '/dɪˈleɪd/', dict: 'adj./v. 延迟的；被推迟', ctx: '任务逾期的状态', it: true },
+            we: { ipa: '/wiː/', dict: 'pron. 我们', ctx: '团队视角' },
+            did: { ipa: '/dɪd/', dict: 'aux. 强调助动词', ctx: '强调「确实完成了」' },
+            finish: { ipa: '/ˈfɪnɪʃ/', dict: 'v. 完成（原形）', ctx: '接在 did 后必须用原形' },
+            the: { ipa: '/ðə/', dict: 'art. 定冠词', ctx: '特指该代码' },
+            code: { ipa: '/kəʊd/', dict: 'n. 代码', ctx: '程序代码', it: true },
+            staging: { ipa: '/ˈsteɪdʒɪŋ/', dict: 'n. 预发/测试环境', ctx: '上线前环境', it: true },
+            environment: { ipa: '/ɪnˈvaɪrənmənt/', dict: 'n. 环境', ctx: '与 staging 构成固定说法', it: true },
+            had: { ipa: '/hæd/', dict: 'v. have 过去式', ctx: '过去存在的问题' },
+            a: { ipa: '/ə/', dict: 'art. 一个', ctx: '一次问题' },
+            config: { ipa: '/kənˈfɪɡ/', dict: 'n. 配置', ctx: '系统配置', it: true },
+            issue: { ipa: '/ˈɪʃuː/', dict: 'n. 问题', ctx: '技术故障', it: true },
+            "we've": { ipa: '/wiːv/', dict: 'we have', ctx: '现在完成时' },
+            already: { ipa: '/ɔːlˈredi/', dict: 'adv. 已经', ctx: '强调动作已完成' },
+            fixed: { ipa: '/fɪkst/', dict: 'v. 修复（过去分词）', ctx: 'have fixed 的分词形式', it: true },
+            it: { ipa: '/ɪt/', dict: 'pron. 它', ctx: '指代 config issue' },
+            and: { ipa: '/ənd/', dict: 'conj. 并且', ctx: '连接补救与时间' },
+            deploy: { ipa: '/dɪˈplɔɪ/', dict: 'n. 部署', ctx: '发布动作', it: true },
+            will: { ipa: '/wɪl/', dict: 'aux. 将要', ctx: '将来承诺' },
+            complete: { ipa: '/kəmˈpliːt/', dict: 'v. 完成（原形）', ctx: 'will 后用原形' },
+            in: { ipa: '/ɪn/', dict: 'prep. 在…内', ctx: '时间范围' },
+            '30': { ipa: '/ˈθɜːrti/', dict: 'num. 三十', ctx: '三十分钟' },
+            minutes: { ipa: '/ˈmɪnɪts/', dict: 'n. 分钟', ctx: '时间单位' }
+          }
+        },
+        {
+          id: 'd2',
+          scene: '邮件 · 进度',
+          role: '汇报',
+          patternId: 'p1',
+          patternName: 'It is + adj. + to do',
+          logicId: 'l1',
+          logicName: '结论 → 原因 → 方案',
+          grammarTag: '形式主语 It · to do',
+          otherTokens: [
+            W('Can'), T(' '), W('you'), T(' '), W('share'), T(' '), W('a'), T(' '), C(W('quick'), T(' '), W('update')), T(' '), W('on'), T(' '), W('the'), T(' '), W('API'), T(' '), W('migration'), T('?')
+          ],
+          otherCn: '能快速同步一下 API 迁移进度吗？',
+          replyTokens: [
+            S(W('It'), T(' '), W('is'), T(' '), W('important'), T(' '), W('to'), T(' '), W('flag')),
+            T(' that migration is 80% done. The '),
+            C(W('remaining'), T(' '), W('risk')),
+            T(' '), S(W('is')), T(' timeout on '),
+            C(W('legacy'), T(' '), W('endpoints')),
+            T('. '),
+            W('We'), T(' '), S(W('will'), T(' '), W('finish')), T(' '), W('validation'), T(' '), W('by'), T(' '), W('Friday'), T('.')
+          ],
+          replyCn: '需要先说明：迁移已完成 80%。剩余风险是旧接口超时。我们周五前完成验证。',
+          grammarIds: ['g_formal_it', 'g_to_inf', 'g_linking', 'g_will'],
+          grammar: {
+            stem: 'It is important to flag → risk is… → will finish',
+            lens: '英语句子常先放轻的架子，把重信息往后放；be 用来判断「是什么」。',
+            items: [
+              {
+                k: 'It is adj. to do（形式主语）',
+                essence: '真正主语是后面的 to do；It 只占位，让句子先轻后重、更好读。',
+                when: '先评价再抛信息：「有必要指出…」「很难…」「重要的是…」。',
+                form: 'It is + adj. + to + 原形'
+              },
+              {
+                k: 'risk is timeout（系表判断）',
+                essence: 'be 不表示「动作」，而表示「等于 / 属于 / 处于」的判断关系。',
+                when: '给事物下定义或贴标签：剩余风险是什么。',
+                form: 'S + be + C'
+              },
+              {
+                k: 'will finish（未来落地）',
+                essence: 'will 把尚未发生的动作推到未来时间线。',
+                when: '汇报下一步计划与截止点。',
+                form: 'will + 原形'
+              }
+            ]
+          },
+          logic: {
+            slot: '结论先行 → 说明风险 → 给出方案时间',
+            steps: [
+              '结论：migration is 80% done',
+              '风险：timeout on legacy endpoints',
+              '方案：finish validation by Friday'
+            ]
+          },
+          words: {
+            can: { ipa: '/kæn/', dict: 'aux. 能', ctx: '礼貌请求' },
+            you: { ipa: '/juː/', dict: 'pron. 你', ctx: '对方' },
+            share: { ipa: '/ʃeə/', dict: 'v. 同步；分享', ctx: '通报进度' },
+            a: { ipa: '/ə/', dict: 'art. 一个', ctx: '一次更新' },
+            quick: { ipa: '/kwɪk/', dict: 'adj. 快速的', ctx: '简短同步' },
+            update: { ipa: '/ˈʌpdeɪt/', dict: 'n. 进展通报', ctx: '进度更新' },
+            on: { ipa: '/ɒn/', dict: 'prep. 关于', ctx: '关于迁移' },
+            the: { ipa: '/ðə/', dict: 'art. 定冠词', ctx: '特指' },
+            api: { ipa: '/ˌeɪ piː ˈaɪ/', dict: 'n. 接口', ctx: 'API', it: true },
+            migration: { ipa: '/maɪˈɡreɪʃn/', dict: 'n. 迁移', ctx: '接口迁移项目', it: true },
+            it: { ipa: '/ɪt/', dict: 'pron. 形式主语', ctx: '占位，真正主语是 to flag…' },
+            is: { ipa: '/ɪz/', dict: 'v. 是', ctx: '系动词' },
+            important: { ipa: '/ɪmˈpɔːtnt/', dict: 'adj. 重要的', ctx: '有必要指出' },
+            to: { ipa: '/tə/', dict: 'inf. 不定式标记', ctx: '后接动词原形' },
+            flag: { ipa: '/flæɡ/', dict: 'v. 特别指出', ctx: '提醒注意某进展/风险', it: true },
+            that: { ipa: '/ðæt/', dict: 'conj. 引导从句', ctx: '引出内容' },
+            '80%': { ipa: '/ˈeɪti pəˈsent/', dict: '百分之八十', ctx: '完成度' },
+            done: { ipa: '/dʌn/', dict: 'adj. 完成的', ctx: '已完成状态' },
+            remaining: { ipa: '/rɪˈmeɪnɪŋ/', dict: 'adj. 剩余的', ctx: '还没消除的' },
+            risk: { ipa: '/rɪsk/', dict: 'n. 风险', ctx: '项目风险', it: true },
+            timeout: { ipa: '/ˈtaɪmaʊt/', dict: 'n. 超时', ctx: '接口超时', it: true },
+            legacy: { ipa: '/ˈleɡəsi/', dict: 'adj. 遗留的', ctx: '旧系统', it: true },
+            endpoints: { ipa: '/ˈendpɔɪnts/', dict: 'n. 接口端点', ctx: 'API 地址', it: true },
+            we: { ipa: '/wiː/', dict: 'pron. 我们', ctx: '团队' },
+            will: { ipa: '/wɪl/', dict: 'aux. 将', ctx: '将来计划' },
+            finish: { ipa: '/ˈfɪnɪʃ/', dict: 'v. 完成（原形）', ctx: 'will 后原形' },
+            validation: { ipa: '/ˌvælɪˈdeɪʃn/', dict: 'n. 验证', ctx: '测试验收', it: true },
+            by: { ipa: '/baɪ/', dict: 'prep. 不迟于', ctx: '截止周五' },
+            friday: { ipa: '/ˈfraɪdeɪ/', dict: 'n. 星期五', ctx: '时间点' }
+          }
+        },
+        {
+          id: 'd3',
+          scene: '协作 · 求助',
+          role: '发起',
+          patternId: 'p3',
+          patternName: 'Could you… so that…',
+          logicId: 'l1',
+          logicName: '结论 → 原因 → 方案',
+          grammarTag: '委婉语气 · so that',
+          otherTokens: [
+            T('('), W('You'), T(' '), W('need'), T(' '), W('a'), T(' '), W('PR'), T(' '), W('review'), T(' '), W('to'), T(' '), W('unblock'), T(' '), W('yourself'), T('.)')
+          ],
+          otherCn: '（你需要对方 review PR 才能继续。）',
+          replyTokens: [
+            S(W('Could'), T(' '), W('you'), T(' '), W('review')),
+            T(' this PR today '),
+            C(W('so'), T(' '), W('that')),
+            T(' '),
+            S(W('I'), T(' '), W('can'), T(' '), W('merge')),
+            T(' and continue the remaining tasks this afternoon?')
+          ],
+          replyCn: '能不能今天帮我看一下这个 PR？这样我就能合并，下午继续做剩余任务。',
+          grammarIds: ['g_could_polite', 'g_modal_bare', 'g_so_that'],
+          grammar: {
+            stem: 'Could you review → so that → I can merge',
+            lens: '情态词先改「说话人对事件的态度」，再接动词原形；从句把目的接在请求后面。',
+            items: [
+              {
+                k: 'Could you…（礼貌，不是过去时）',
+                essence: '情态动词管的是可能性/礼貌/能力，不是把时间拨到过去。Could 在这里是软化请求。',
+                when: '向同事提请求，需要比 Can you 更客气。',
+                form: 'Could + 主语 + 原形'
+              },
+              {
+                k: 'so that…（目的）',
+                essence: '主句说要对方做什么，从句说这样做是为了什么结果。',
+                when: '请求里需要带上「我为什么要你帮忙」。',
+                form: '… so that + 主语 + can/will + 原形'
+              },
+              {
+                k: 'I can merge（结果能力）',
+                essence: 'can 表示具备做某事的条件/能力。',
+                when: '说明请求被满足后，你就能继续推进。',
+                form: 'can + 原形'
+              }
+            ]
+          },
+          logic: {
+            slot: '提出请求 → 说明目的 → 给出时间感',
+            steps: [
+              '请求：Could you review this PR today',
+              '目的：so that I can merge…',
+              '时间：this afternoon'
+            ]
+          },
+          words: {
+            you: { ipa: '/juː/', dict: 'pron. 你', ctx: '对方' },
+            need: { ipa: '/niːd/', dict: 'v. 需要', ctx: '情境' },
+            a: { ipa: '/ə/', dict: 'art. 一次', ctx: '一次评审' },
+            pr: { ipa: '/ˌpiː ˈɑː/', dict: 'n. 合并请求', ctx: 'Pull Request', it: true },
+            review: { ipa: '/rɪˈvjuː/', dict: 'v./n. 评审', ctx: '看代码', it: true },
+            to: { ipa: '/tə/', dict: 'inf. 以便', ctx: '目的' },
+            unblock: { ipa: '/ʌnˈblɒk/', dict: 'v. 解除阻塞', ctx: '让工作继续', it: true },
+            yourself: { ipa: '/jɔːˈself/', dict: 'pron. 你自己', ctx: '反身' },
+            could: { ipa: '/kʊd/', dict: 'aux. 能（委婉）', ctx: '礼貌请求，非过去时' },
+            this: { ipa: '/ðɪs/', dict: 'pron. 这个', ctx: '当前 PR' },
+            today: { ipa: '/təˈdeɪ/', dict: 'adv. 今天', ctx: '希望当天' },
+            so: { ipa: '/səʊ/', dict: 'conj. 以便', ctx: 'so that 的一部分' },
+            that: { ipa: '/ðæt/', dict: 'conj. 引导从句', ctx: 'so that' },
+            i: { ipa: '/aɪ/', dict: 'pron. 我', ctx: '请求方' },
+            can: { ipa: '/kæn/', dict: 'aux. 能够', ctx: '结果能力' },
+            merge: { ipa: '/mɜːdʒ/', dict: 'v. 合并', ctx: '合并代码', it: true },
+            and: { ipa: '/ənd/', dict: 'conj. 并且', ctx: '连接' },
+            continue: { ipa: '/kənˈtɪnjuː/', dict: 'v. 继续', ctx: '继续开发' },
+            the: { ipa: '/ðə/', dict: 'art. 定冠词', ctx: '剩余任务' },
+            remaining: { ipa: '/rɪˈmeɪnɪŋ/', dict: 'adj. 剩余的', ctx: '未完成' },
+            tasks: { ipa: '/tɑːsks/', dict: 'n. 任务', ctx: '待办' },
+            afternoon: { ipa: '/ˌɑːftəˈnuːn/', dict: 'n. 下午', ctx: '今天下午' }
+          }
+        }
+      ];
+
+      function loadMap(key) {
+        try { return JSON.parse(localStorage.getItem(key) || '{}') || {}; }
+        catch (_) { return {}; }
+      }
+      function loadSet(key) {
+        try { return new Set(JSON.parse(localStorage.getItem(key) || '[]') || []); }
+        catch (_) { return new Set(); }
+      }
+
+      const state = {
+        favs: loadSet('wawa_favs'),
+        today: Number(localStorage.getItem('wawa_today') || 0),
+        litPatterns: new Set(['p1', 'p2']),
+        litLogics: new Set(['l2']),
+        filterRole: 'all',
+        filterFreq: 'ultra',
+        filterPattern: null,
+        /** grammarId -> dialogueId[]（展开过语法拆解的对话） */
+        grammarSeen: loadMap('wawa_grammar'),
+        wordsSeen: loadSet('wawa_words_seen'),
+        wordsTapped: loadSet('wawa_words_tapped'),
+        atlasKind: 'grammar',
+        grammarTab: 'all',
+        vocabTab: 'all'
+      };
+
+      const feed = document.getElementById('feed');
+      const toastEl = document.getElementById('toast');
+      const overlay = document.getElementById('overlay');
+      const wordOverlay = document.getElementById('wordOverlay');
+      const atlasOverlay = document.getElementById('atlasOverlay');
+
+      function persistAtlas() {
+        localStorage.setItem('wawa_grammar', JSON.stringify(state.grammarSeen));
+        localStorage.setItem('wawa_words_seen', JSON.stringify([...state.wordsSeen]));
+        localStorage.setItem('wawa_words_tapped', JSON.stringify([...state.wordsTapped]));
+      }
+
+      function grammarStatus(id) {
+        const hits = (state.grammarSeen[id] || []).length;
+        if (hits >= 2) return 'mastered';
+        if (hits >= 1) return 'seen';
+        return 'new';
+      }
+
+      function markGrammar(dialogue) {
+        if (!dialogue || !dialogue.grammarIds) return;
+        let changed = false;
+        dialogue.grammarIds.forEach(gid => {
+          const arr = state.grammarSeen[gid] || (state.grammarSeen[gid] = []);
+          if (!arr.includes(dialogue.id)) {
+            arr.push(dialogue.id);
+            changed = true;
+          }
+        });
+        if (changed) {
+          persistAtlas();
+          syncStats();
+        }
+      }
+
+      function collectWordsFromDialogue(dialogue) {
+        const keys = new Set();
+        Object.keys(dialogue.words || {}).forEach(k => {
+          if (!STOP_WORDS.has(k.toLowerCase())) keys.add(k.toLowerCase());
+        });
+        return keys;
+      }
+
+      function markWordsSeen(dialogue) {
+        if (!dialogue) return;
+        let changed = false;
+        collectWordsFromDialogue(dialogue).forEach(k => {
+          if (!state.wordsSeen.has(k)) {
+            state.wordsSeen.add(k);
+            changed = true;
+          }
+        });
+        if (changed) {
+          persistAtlas();
+          syncStats();
+        }
+      }
+
+      function markWordTapped(key) {
+        const k = String(key || '').toLowerCase();
+        if (!k || STOP_WORDS.has(k)) return;
+        let changed = false;
+        if (!state.wordsSeen.has(k)) {
+          state.wordsSeen.add(k);
+          changed = true;
+        }
+        if (!state.wordsTapped.has(k)) {
+          state.wordsTapped.add(k);
+          changed = true;
+        }
+        if (changed) {
+          persistAtlas();
+          syncStats();
+        }
+      }
+
+      /** 从全部对话汇集词汇袋词条 */
+      function buildVocabLexicon() {
+        const map = new Map();
+        dialogues.forEach(d => {
+          Object.entries(d.words || {}).forEach(([key, info]) => {
+            const k = key.toLowerCase();
+            if (STOP_WORDS.has(k)) return;
+            if (!map.has(k)) {
+              map.set(k, {
+                key: k,
+                surface: key,
+                dict: info.dict || '',
+                it: !!info.it,
+                sample: d.scene
+              });
+            } else if (info.it) {
+              map.get(k).it = true;
+            }
+          });
+        });
+        return [...map.values()].sort((a, b) => a.key.localeCompare(b.key));
+      }
+
+      function atlasCounts() {
+        let mastered = 0, seen = 0;
+        GRAMMAR_ATLAS.forEach(g => {
+          const st = grammarStatus(g.id);
+          if (st === 'mastered') mastered += 1;
+          else if (st === 'seen') seen += 1;
+        });
+        const grammarLit = mastered + seen;
+        const lexicon = buildVocabLexicon();
+        const itTotal = lexicon.filter(w => w.it).length;
+        const itSeen = lexicon.filter(w => w.it && state.wordsSeen.has(w.key)).length;
+        return {
+          mastered,
+          seen,
+          grammarLit: Math.min(GRAMMAR_GOAL, grammarLit),
+          vocabSeen: Math.min(VOCAB_GOAL, state.wordsSeen.size),
+          tapped: state.wordsTapped.size,
+          itSeen,
+          itTotal
+        };
+      }
+
+      function toast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add('show');
+        clearTimeout(toastEl._t);
+        toastEl._t = setTimeout(() => toastEl.classList.remove('show'), 1800);
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function renderTokens(tokens, dialogueId, side) {
+        function walk(nodes) {
+          return nodes.map(node => {
+            if (node.t === 'text') return escapeHtml(node.w);
+            if (node.t === 'word') {
+              return `<span class="w" data-dlg="${dialogueId}" data-side="${side}" data-key="${escapeHtml(node.key)}" data-surface="${escapeHtml(node.w)}">${escapeHtml(node.w)}</span>`;
+            }
+            if (node.t === 'struct') return `<span class="struct">${walk(node.kids)}</span>`;
+            if (node.t === 'colloc') return `<span class="colloc">${walk(node.kids)}</span>`;
+            return '';
+          }).join('');
+        }
+        return walk(tokens);
+      }
+
+      function tokensToPlain(tokens) {
+        function walk(nodes) {
+          return nodes.map(n => {
+            if (n.t === 'text' || n.t === 'word') return n.w;
+            if (n.kids) return walk(n.kids);
+            return '';
+          }).join('');
+        }
+        return walk(tokens);
+      }
+
+      function speak(text) {
+        if (!window.speechSynthesis) { toast('当前浏览器不支持朗读'); return; }
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(text);
+        u.lang = 'en-US';
+        u.rate = 0.95;
+        window.speechSynthesis.speak(u);
+      }
+
+      function syncStats() {
+        document.getElementById('todayCount').textContent = state.today;
+        document.getElementById('litCount').textContent = state.litPatterns.size;
+        document.getElementById('statPattern').textContent = state.litPatterns.size;
+        document.getElementById('statLogic').textContent = state.litLogics.size;
+        document.getElementById('statFav').textContent = state.favs.size;
+        document.getElementById('favBadge').textContent = state.favs.size;
+        document.getElementById('overallBar').style.width = Math.min(100, Math.round((state.litPatterns.size / 20) * 100)) + '%';
+
+        const c = atlasCounts();
+        const unseenG = Math.max(0, GRAMMAR_GOAL - c.mastered - c.seen);
+        document.getElementById('statGrammar').innerHTML =
+          `${c.grammarLit}<span style="font-size:12px;font-weight:600;color:inherit;opacity:.7">/${GRAMMAR_GOAL}</span>`;
+        document.getElementById('statVocab').innerHTML =
+          `${c.vocabSeen}<span style="font-size:12px;font-weight:600;color:inherit;opacity:.7">/${VOCAB_GOAL}</span>`;
+        document.getElementById('atlasGrammarNum').innerHTML = `${c.grammarLit}<span> / ${GRAMMAR_GOAL}</span>`;
+        document.getElementById('atlasGrammarSub').textContent =
+          `掌握 ${c.mastered} · 见过 ${c.seen} · 未遇 ${unseenG}`;
+        document.getElementById('atlasVocabNum').innerHTML = `${c.vocabSeen}<span> / ${VOCAB_GOAL}</span>`;
+        document.getElementById('atlasVocabSub').textContent =
+          `点查 ${c.tapped} · IT词 ${c.itSeen}/${c.itTotal || 0} · 阶段目标 ${VOCAB_GOAL}`;
+      }
+
+      function patternNames(ids) {
+        return (ids || [])
+          .map(id => patterns.find(p => p.id === id))
+          .filter(Boolean)
+          .map(p => p.name);
+      }
+
+      function renderAtlasTabs() {
+        const tabs = document.getElementById('atlasTabs');
+        if (state.atlasKind === 'grammar') {
+          const cur = state.grammarTab;
+          tabs.innerHTML = `
+            <button type="button" data-gtab="all" class="${cur === 'all' ? 'on' : ''}">分区全览</button>
+            <button type="button" data-gtab="lit" class="${cur === 'lit' ? 'on' : ''}">已点亮</button>
+            <button type="button" data-gtab="new" class="${cur === 'new' ? 'on' : ''}">未遇</button>`;
+          tabs.style.display = 'flex';
+          return;
+        }
+        const cur = state.vocabTab;
+        tabs.innerHTML = `
+          <button type="button" data-vtab="all" class="${cur === 'all' ? 'on' : ''}">全部</button>
+          <button type="button" data-vtab="tapped" class="${cur === 'tapped' ? 'on' : ''}">点查过</button>
+          <button type="button" data-vtab="it" class="${cur === 'it' ? 'on' : ''}">IT 词</button>`;
+        tabs.style.display = 'flex';
+      }
+
+      function renderGrammarAtlas() {
+        const list = document.getElementById('atlasList');
+        const tab = state.grammarTab;
+        const statusRank = { mastered: 0, seen: 1, new: 2 };
+
+        const matchTab = (st) => {
+          if (tab === 'lit') return st === 'mastered' || st === 'seen';
+          if (tab === 'new') return st === 'new';
+          return true;
+        };
+
+        const sections = [];
+        GRAMMAR_CAT_ORDER.forEach(cat => {
+          const items = GRAMMAR_ATLAS
+            .filter(g => g.cat === cat)
+            .sort((a, b) => a.order - b.order)
+            .map(g => ({
+              g,
+              st: grammarStatus(g.id),
+              hits: (state.grammarSeen[g.id] || []).length,
+              links: patternNames(g.patternIds)
+            }))
+            .filter(row => matchTab(row.st));
+
+          if (!items.length) return;
+
+          const allInCat = GRAMMAR_ATLAS.filter(g => g.cat === cat);
+          const litCount = allInCat.filter(g => {
+            const st = grammarStatus(g.id);
+            return st === 'mastered' || st === 'seen';
+          }).length;
+
+          // 全览时区内保持教材顺序；筛选视图可按点亮优先
+          if (tab !== 'all') {
+            items.sort((a, b) => statusRank[a.st] - statusRank[b.st] || a.g.order - b.g.order);
+          }
+
+          sections.push({ cat, items, litCount, total: allInCat.length });
+        });
+
+        if (!sections.length) {
+          list.innerHTML = `<p class="atlas-empty">${tab === 'lit'
+            ? '还没有点亮的语法点。去首页展开「语法拆解」即可收录。'
+            : '这一栏暂时没有条目。'}</p>`;
+          return;
+        }
+
+        list.innerHTML = sections.map(({ cat, items, litCount, total }) => {
+          const pct = total ? Math.round((litCount / total) * 100) : 0;
+          const blurb = GRAMMAR_CAT_BLURB[cat] || '';
+          const rows = items.map(({ g, st, hits, links }) => {
+            const label = st === 'mastered' ? '掌握' : st === 'seen' ? '见过' : (g.stage === 'later' ? '后续' : '未遇');
+            const cls = [st === 'new' ? '' : st, g.stage === 'later' && st === 'new' ? 'later' : ''].filter(Boolean).join(' ');
+            const linkTxt = links.length
+              ? `句型：${links.join(' · ')}`
+              : '';
+            const hitTxt = hits ? `已在 ${hits} 条对话见过` : (g.stage === 'later' ? '刷到对应句型后点亮' : '展开语法拆解后点亮');
+            return `<div class="atlas-item ${cls}">
+              <span class="dot"></span>
+              <div class="meta">
+                <div class="name">${escapeHtml(g.name)}</div>
+                <div class="desc">${escapeHtml(g.desc)}</div>
+                ${linkTxt ? `<div class="link">${escapeHtml(linkTxt)}</div>` : ''}
+                <div class="link">${escapeHtml(hitTxt)}</div>
+              </div>
+              <span class="st">${label}</span>
+            </div>`;
+          }).join('');
+
+          return `<section class="atlas-sec">
+            <div class="atlas-sec-h">
+              <div class="sec-name">${escapeHtml(cat)}<small>${escapeHtml(blurb)}</small></div>
+              <div class="sec-prog">${litCount}/${total}</div>
+            </div>
+            <div class="atlas-sec-bar"><i style="width:${pct}%"></i></div>
+            ${rows}
+          </section>`;
+        }).join('');
+      }
+
+      function renderAtlasList() {
+        const list = document.getElementById('atlasList');
+        if (state.atlasKind === 'grammar') {
+          renderGrammarAtlas();
+          return;
+        }
+
+        let words = buildVocabLexicon();
+        if (state.vocabTab === 'tapped') words = words.filter(w => state.wordsTapped.has(w.key));
+        if (state.vocabTab === 'it') words = words.filter(w => w.it);
+        if (!words.length) {
+          list.innerHTML = '<p class="atlas-empty">还没有匹配的词。去首页揭晓对话或点查单词吧。</p>';
+          return;
+        }
+        list.innerHTML = words.map(w => {
+          const tapped = state.wordsTapped.has(w.key);
+          const seen = state.wordsSeen.has(w.key);
+          const st = tapped ? 'mastered' : seen ? 'seen' : 'new';
+          const label = tapped ? '点查' : seen ? '见过' : '未遇';
+          const cls = st === 'new' ? '' : st;
+          return `<div class="atlas-item ${cls}">
+            <span class="dot"></span>
+            <div class="meta">
+              <div class="name">${escapeHtml(w.surface)}${w.it ? ' <span style="font-weight:600;color:#5a9a7e;font-size:11px">IT</span>' : ''}</div>
+              <div class="desc">${escapeHtml(w.dict || '—')}</div>
+            </div>
+            <span class="st">${label}</span>
+          </div>`;
+        }).join('');
+      }
+
+      function openAtlas(kind) {
+        state.atlasKind = kind;
+        document.getElementById('atlasTitle').textContent = kind === 'grammar' ? '语法地图' : '词汇袋';
+        document.getElementById('atlasHint').textContent = kind === 'grammar'
+          ? '按语法分区固定排布；见过=展开拆解，掌握=≥2 条对话见过。每条挂靠相关句型。'
+          : '见过 = 揭晓对话后收录；点查 = 点过该词；IT = 职场技术词';
+        if (kind === 'grammar') state.grammarTab = 'all';
+        else state.vocabTab = 'all';
+        renderAtlasTabs();
+        renderAtlasList();
+        atlasOverlay.classList.add('show');
+      }
+
+      function closeAtlas() {
+        atlasOverlay.classList.remove('show');
+      }
+
+      function visibleDialogues() {
+        return dialogues.filter(d => {
+          if (state.filterPattern && d.patternId !== state.filterPattern && d.logicId !== state.filterPattern) return false;
+          if (state.filterRole !== 'all' && d.role !== state.filterRole) return false;
+          return true;
+        });
+      }
+
+      function showWord(dialogue, key, surface) {
+        const info = (dialogue.words && dialogue.words[key]) || {
+          ipa: '—',
+          dict: '（演示数据未收录，可后续补全）',
+          ctx: '点击的词：' + surface
+        };
+        document.getElementById('wordHead').textContent = surface;
+        document.getElementById('wordIpa').textContent = info.ipa;
+        document.getElementById('wordDict').textContent = info.dict;
+        document.getElementById('wordCtx').textContent = info.ctx;
+        wordOverlay.classList.add('show');
+      }
+
+      function renderFeed() {
+        const list = visibleDialogues();
+        if (!list.length) {
+          feed.innerHTML = '<div class="slide"><div class="card" style="justify-content:center;align-items:center;color:var(--hint)">暂无内容</div></div>';
+          return;
+        }
+        feed.innerHTML = list.map(d => {
+          const favOn = state.favs.has(d.id) ? 'on' : '';
+          const star = state.favs.has(d.id) ? '★' : '☆';
+          return `
+          <article class="slide" data-id="${d.id}">
+            <div class="card">
+              <div class="who">💬 对方说</div>
+              <div class="en-line">"${renderTokens(d.otherTokens, d.id, 'other')}"</div>
+              <div class="cn">${escapeHtml(d.otherCn)}</div>
+              <hr class="divider">
+              <div class="who reply-who">👤 你的回应</div>
+              <div class="reply-meta"><b>${escapeHtml(d.scene)}</b> · ${escapeHtml(d.patternName)} · ${escapeHtml(d.logicName)}</div>
+              <div class="reveal-box" data-reveal>
+                <div class="reveal-hint">先想 3 秒，再点揭晓</div>
+                <div class="reveal-content">
+                  <div class="en-line" style="font-size:18px">"${renderTokens(d.replyTokens, d.id, 'reply')}"</div>
+                  <div class="cn" style="margin-bottom:0">${escapeHtml(d.replyCn)}</div>
+                </div>
+              </div>
+
+              <div class="break-panels">
+                <div class="break-panel">
+                  <div class="break-head grammar" data-break="grammar">
+                    <span>📖 语法拆解（本质 · 何时 · 形态）</span>
+                    <span class="arrow">▼</span>
+                  </div>
+                  <div class="break-body" data-break-body="grammar">
+                    ${d.grammar.lens ? `<div class="slot-label">这一条在讲什么</div><div class="slot">${escapeHtml(d.grammar.lens)}</div>` : ''}
+                    <div class="slot-label">本句主干</div>
+                    <div class="slot">${escapeHtml(d.grammar.stem)}</div>
+                    ${d.grammar.items.map(it => `
+                      <div class="g-item">
+                        <div class="k">${escapeHtml(it.k)}</div>
+                        <div class="g-rows">
+                          <div class="g-row"><em>本质</em>${escapeHtml(it.essence)}</div>
+                          <div class="g-row"><em>何时</em>${escapeHtml(it.when)}</div>
+                          <div class="g-row"><em>形态</em>${escapeHtml(it.form)}</div>
+                        </div>
+                      </div>
+                    `).join('')}
+                  </div>
+                </div>
+                <div class="break-panel">
+                  <div class="break-head logic" data-break="logic">
+                    <span>🧱 表达逻辑拆解（段落）</span>
+                    <span class="arrow">▼</span>
+                  </div>
+                  <div class="break-body" data-break-body="logic">
+                    <div class="slot-label">段落怎么组织</div>
+                    <div class="slot">${escapeHtml(d.logic.slot)}</div>
+                    ${d.logic.steps.map((s, i) => `
+                      <div class="l-item"><span class="n">${i + 1}</span><span>${escapeHtml(s)}</span></div>
+                    `).join('')}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="actions">
+              <button class="act" data-act="listen" type="button"><span class="ico">🔊</span>听</button>
+              <button class="act" data-act="practice" type="button"><span class="ico">🎙️</span>练</button>
+              <button class="act" data-act="note" type="button"><span class="ico">📝</span>记</button>
+              <button class="act fav ${favOn}" data-act="fav" type="button"><span class="ico">${star}</span>收藏</button>
+            </div>
+            <div class="swipe-tip">⬆️ 上滑 · 杏色=句子主干（少而精）· 绿虚线=固定搭配</div>
+          </article>`;
+        }).join('');
+      }
+
+      function ultraReady() {
+        // 超高频句型里，至少练过一半（done>0）即视为可解锁后续
+        const ultras = patterns.filter(p => p.freq === 'ultra');
+        const started = ultras.filter(p => p.done > 0).length;
+        return started >= Math.ceil(ultras.length / 2);
+      }
+
+      function updateFreqHint() {
+        const hint = document.getElementById('freqHint');
+        const ready = ultraReady();
+        const map = {
+          ultra: ready
+            ? '你已开始超高频，继续刷完这一档再进高频会更稳。'
+            : '建议小白先刷完 <strong>超高频</strong>，再解锁高频与进阶。',
+          high: ready
+            ? '已解锁高频。把常用结构练熟，开口会稳很多。'
+            : '高频暂未解锁：请先在「超高频」里至少练过一半句型。',
+          advanced: ready
+            ? '进阶结构偏书面/面试，建议有基础后再刷。'
+            : '进阶暂未解锁：请先完成超高频基础。'
+        };
+        hint.innerHTML = map[state.filterFreq] || map.ultra;
+      }
+
+      function renderDiscover() {
+        const role = state.filterRole;
+        const freq = state.filterFreq;
+        const ready = ultraReady();
+        const matchRole = (item) => role === 'all' || item.roles.includes(role);
+        const matchFreq = (item) => item.freq === freq;
+        const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+
+        updateFreqHint();
+
+        function cardHtml(item, isLogic) {
+          const locked = item.freq !== 'ultra' && !ready;
+          const pct = Math.round(item.done / item.total * 100);
+          return `
+          <div class="struct-card ${locked ? 'locked' : ''}" data-jump="${item.id}" data-locked="${locked ? '1' : '0'}">
+            <div class="card-top">
+              <h3>${escapeHtml(item.name)}</h3>
+              <span class="freq-badge ${item.freq}">${FREQ_LABEL[item.freq]}</span>
+            </div>
+            <p>${escapeHtml(item.desc)}</p>
+            <div class="progress-mini"><span style="width:${pct}%"></span></div>
+            <div class="struct-meta">
+              <span>${item.done}/${item.total} 条 · ${(item.roles || []).join('/')}</span>
+              <span class="go">${locked ? '未解锁' : '去刷 →'}</span>
+            </div>
+          </div>`;
+        }
+
+        const pList = patterns.filter(matchFreq).filter(matchRole)
+          .filter(p => !q || p.name.toLowerCase().includes(q) || p.desc.includes(q));
+        const lList = logics.filter(matchFreq).filter(matchRole)
+          .filter(l => !q || l.name.includes(q) || l.desc.includes(q));
+
+        document.getElementById('panel-patterns').innerHTML = pList.length
+          ? pList.map(p => cardHtml(p, false)).join('')
+          : '<p style="color:var(--hint);font-size:14px">这一档暂时没有匹配的句型</p>';
+
+        document.getElementById('panel-logics').innerHTML = lList.length
+          ? lList.map(l => cardHtml(l, true)).join('')
+          : '<p style="color:var(--hint);font-size:14px">这一档暂时没有匹配的段落逻辑</p>';
+      }
+
+      function switchPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        document.querySelectorAll('.tab').forEach(t => t.classList.toggle('on', t.dataset.page === id));
+        overlay.classList.remove('show');
+        wordOverlay.classList.remove('show');
+        closeAtlas();
+        if (id === 'page-discover') renderDiscover();
+        if (id === 'page-profile') syncStats();
+      }
+
+      feed.addEventListener('click', (e) => {
+        const word = e.target.closest('.w');
+        if (word) {
+          e.stopPropagation();
+          const d = dialogues.find(x => x.id === word.dataset.dlg);
+          if (!d) return;
+          document.querySelectorAll('.w.active').forEach(el => el.classList.remove('active'));
+          word.classList.add('active');
+          markWordTapped(word.dataset.key);
+          showWord(d, word.dataset.key, word.dataset.surface);
+          return;
+        }
+
+        const reveal = e.target.closest('[data-reveal]');
+        if (reveal && !reveal.classList.contains('open')) {
+          // 只有点在 hint 区域或未展开时才打开；点在已展开内容上的单词已在上面处理
+          if (e.target.closest('.reveal-content .w')) return;
+          reveal.classList.add('open');
+          state.today += 1;
+          localStorage.setItem('wawa_today', String(state.today));
+          const slide = reveal.closest('.slide');
+          const d = dialogues.find(x => x.id === slide?.dataset.id);
+          markWordsSeen(d);
+          syncStats();
+          return;
+        }
+
+        const breakHead = e.target.closest('[data-break]');
+        if (breakHead) {
+          const type = breakHead.dataset.break;
+          const panel = breakHead.closest('.break-panel');
+          const body = panel.querySelector(`[data-break-body="${type}"]`);
+          const arrow = breakHead.querySelector('.arrow');
+          const opening = !body.classList.contains('open');
+          body.classList.toggle('open');
+          arrow.classList.toggle('open');
+          if (opening && type === 'grammar') {
+            const slide = breakHead.closest('.slide');
+            const d = dialogues.find(x => x.id === slide?.dataset.id);
+            markGrammar(d);
+          }
+          return;
+        }
+
+        const act = e.target.closest('[data-act]');
+        if (!act) return;
+        const slide = act.closest('.slide');
+        const d = dialogues.find(x => x.id === slide.dataset.id);
+        if (!d) return;
+        const type = act.dataset.act;
+        if (type === 'listen') {
+          speak(tokensToPlain(d.otherTokens) + '. ' + tokensToPlain(d.replyTokens));
+          toast('正在朗读…');
+        } else if (type === 'practice') {
+          toast('跟读回应句（演示）');
+          speak(tokensToPlain(d.replyTokens));
+        } else if (type === 'note') {
+          overlay.classList.add('show');
+          document.getElementById('noteInput').value = '';
+        } else if (type === 'fav') {
+          if (state.favs.has(d.id)) state.favs.delete(d.id);
+          else state.favs.add(d.id);
+          localStorage.setItem('wawa_favs', JSON.stringify([...state.favs]));
+          renderFeed();
+          syncStats();
+          toast(state.favs.has(d.id) ? '已收藏' : '已取消收藏');
+        }
+      });
+
+      document.getElementById('closeWord').addEventListener('click', () => {
+        wordOverlay.classList.remove('show');
+        document.querySelectorAll('.w.active').forEach(el => el.classList.remove('active'));
+      });
+      wordOverlay.addEventListener('click', (e) => {
+        if (e.target === wordOverlay) {
+          wordOverlay.classList.remove('show');
+          document.querySelectorAll('.w.active').forEach(el => el.classList.remove('active'));
+        }
+      });
+
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.addEventListener('click', () => switchPage(tab.dataset.page));
+      });
+
+      document.querySelectorAll('.sub-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+          document.querySelectorAll('.sub-tab').forEach(t => t.classList.remove('on'));
+          tab.classList.add('on');
+          const panel = tab.dataset.panel;
+          document.getElementById('panel-patterns').style.display = panel === 'patterns' ? 'block' : 'none';
+          document.getElementById('panel-logics').style.display = panel === 'logics' ? 'block' : 'none';
+        });
+      });
+
+      document.getElementById('freqChips').addEventListener('click', (e) => {
+        const chip = e.target.closest('.freq-chip');
+        if (!chip) return;
+        document.querySelectorAll('#freqChips .freq-chip').forEach(c => c.classList.remove('on'));
+        chip.classList.add('on');
+        state.filterFreq = chip.dataset.freq;
+        state.filterPattern = null;
+        renderDiscover();
+      });
+
+      document.getElementById('roleChips').addEventListener('click', (e) => {
+        const chip = e.target.closest('.chip');
+        if (!chip) return;
+        document.querySelectorAll('#roleChips .chip').forEach(c => c.classList.remove('on'));
+        chip.classList.add('on');
+        state.filterRole = chip.dataset.role;
+        state.filterPattern = null;
+        renderDiscover();
+      });
+
+      document.getElementById('searchInput').addEventListener('input', renderDiscover);
+
+      document.getElementById('page-discover').addEventListener('click', (e) => {
+        const card = e.target.closest('[data-jump]');
+        if (!card) return;
+        if (card.dataset.locked === '1') {
+          toast('先刷完超高频（至少练过一半），再来这里');
+          return;
+        }
+        state.filterPattern = card.dataset.jump;
+        state.filterRole = 'all';
+        document.querySelectorAll('#roleChips .chip').forEach(c => c.classList.toggle('on', c.dataset.role === 'all'));
+        renderFeed();
+        switchPage('page-home');
+        feed.scrollTo({ top: 0, behavior: 'smooth' });
+        const item = patterns.find(x => x.id === card.dataset.jump) || logics.find(x => x.id === card.dataset.jump);
+        toast(item ? `已定位：${FREQ_LABEL[item.freq] || ''} ${item.name}` : '已定位到该结构');
+      });
+
+      function applyTheme(dark) {
+        document.getElementById('app').setAttribute('data-theme', dark ? 'dark' : 'light');
+        document.getElementById('themeBtn').textContent = dark ? '浅色' : '深色';
+        document.getElementById('themeLabel').textContent = (dark ? '深色' : '浅色') + ' ›';
+        localStorage.setItem('wawa_theme', dark ? 'dark' : 'light');
+      }
+      document.getElementById('themeBtn').addEventListener('click', () => {
+        applyTheme(document.getElementById('app').getAttribute('data-theme') !== 'dark');
+      });
+      document.getElementById('btnThemeRow').addEventListener('click', () => document.getElementById('themeBtn').click());
+
+      overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.classList.remove('show'); });
+      document.getElementById('saveNote').addEventListener('click', () => {
+        if (!document.getElementById('noteInput').value.trim()) { toast('先写一句'); return; }
+        overlay.classList.remove('show');
+        toast('笔记已保存（演示）');
+      });
+      document.getElementById('btnNotes').addEventListener('click', () => overlay.classList.add('show'));
+      document.getElementById('btnFavs').addEventListener('click', () => toast(state.favs.size ? `已收藏 ${state.favs.size} 条` : '还没有收藏'));
+      document.getElementById('btnSub').addEventListener('click', () => toast('演示：年费 ¥99'));
+
+      document.getElementById('btnGrammarAtlas').addEventListener('click', () => openAtlas('grammar'));
+      document.getElementById('btnVocabAtlas').addEventListener('click', () => openAtlas('vocab'));
+      document.getElementById('closeAtlas').addEventListener('click', closeAtlas);
+      atlasOverlay.addEventListener('click', (e) => { if (e.target === atlasOverlay) closeAtlas(); });
+      document.getElementById('atlasTabs').addEventListener('click', (e) => {
+        const gbtn = e.target.closest('button[data-gtab]');
+        if (gbtn) {
+          state.grammarTab = gbtn.dataset.gtab;
+          document.querySelectorAll('#atlasTabs button').forEach(b => b.classList.toggle('on', b === gbtn));
+          renderAtlasList();
+          return;
+        }
+        const vbtn = e.target.closest('button[data-vtab]');
+        if (!vbtn) return;
+        state.vocabTab = vbtn.dataset.vtab;
+        document.querySelectorAll('#atlasTabs button').forEach(b => b.classList.toggle('on', b === vbtn));
+        renderAtlasList();
+      });
+
+      applyTheme(localStorage.getItem('wawa_theme') === 'dark');
+      renderFeed();
+      renderDiscover();
+      syncStats();
+    })();
+  </script>
+</body>
+</html>
