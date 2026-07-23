@@ -328,6 +328,20 @@
     margin: 0 0 12px; font-size: 12px; letter-spacing: 2px; color: #d2eaff;
     display: flex; align-items: center; gap: 8px; font-weight: 800;
   }
+  .ck-side h4 .ck-fold { margin-left: auto; color: #7fb4ff; font-size: 14px; transition: transform .2s; }
+  .ck-side.collapsed h4 .ck-fold { transform: rotate(-90deg); }
+  .ck-side.collapsed .ck-alerts-wrap { display: none; }
+  .ck-alerts-wrap {
+    max-height: 300px; overflow: hidden; position: relative;
+    mask-image: linear-gradient(180deg, transparent, #000 8%, #000 92%, transparent);
+  }
+  #ckAlerts { will-change: transform; }
+  #ckAlerts.ck-scroll { animation: ckAlertScroll 18s linear infinite; }
+  #ckAlerts:hover { animation-play-state: paused; }
+  @keyframes ckAlertScroll {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+  }
   .ck-side h4 .blink, .ck-left h4 .blink {
     width: 8px; height: 8px; border-radius: 50%; background: #ff5a72; box-shadow: 0 0 12px #ff5a72;
     animation: blink 1.1s ease-in-out infinite;
@@ -470,6 +484,23 @@
   .ms-panel label { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border-radius: 6px; cursor: pointer; font-size: 13px; }
   .ms-panel label:hover { background: #f3f4f6; }
   .ms-panel .grp { font-size: 11px; color: var(--muted); padding: 6px 8px 2px; font-weight: 700; }
+  /* 年月树形多选（年可折叠） */
+  .ms.ym { min-width: 220px; }
+  .ms-panel.ym-tree { min-width: 240px; max-height: 300px; }
+  .ms-panel .ym-block { border-bottom: 1px solid #f0f1f3; }
+  .ms-panel .ym-year {
+    font-weight: 700; display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 6px; cursor: pointer;
+  }
+  .ms-panel .ym-year:hover { background: #f3f4f6; }
+  .ms-panel .ym-caret {
+    width: 14px; text-align: center; color: var(--muted); font-size: 10px; transition: transform .15s; flex: none;
+  }
+  .ms-panel .ym-block.collapsed .ym-caret { transform: rotate(-90deg); }
+  .ms-panel .ym-block.collapsed .ym-months { display: none; }
+  .ms-panel .ym-month { padding-left: 28px !important; color: #374151; font-weight: 500; }
+  .filters.report-filters { gap: 12px 14px; }
+  .filters.report-filters .field { min-width: 140px; }
+  .filters.report-filters .ms { min-width: 150px; }
 
   /* larger modal */
   .modal.lg { width: 560px; }
@@ -505,6 +536,17 @@
     height: 30px; width: 100%; min-width: 92px; border: 1px solid #d7dbe2; border-radius: 6px; font-size: 12.5px; padding: 0 6px; background:#fff;
   }
   .entity-block td .note-inp { min-width: 160px; }
+  /* 失效行/节点置灰 */
+  tr.row-off { opacity: .48; color: #9aa1ad; background: #f7f8fa; }
+  tr.row-off td { color: #9aa1ad; }
+  tr.row-off .cell-ro { color: #9aa1ad; }
+  .badge-off {
+    display: inline-block; margin-left: 6px; font-size: 11px; font-weight: 700;
+    color: #9aa1ad; background: #eef0f3; border: 1px solid #e2e5ea; padding: 1px 6px; border-radius: 4px; vertical-align: middle;
+  }
+  .tree li.node-off > .node { opacity: .48; color: #9aa1ad; }
+  .tree li.node-off > .node .tag { filter: grayscale(1); opacity: .75; }
+  .tree .node-actions .mini.off-toggle { color: #6b7280; border-color: #d7dbe2; }
 
   /* 「数据列表」：容器内纵向滚动，两行表头（年份/月份）吸附在容器顶部 */
   .upload-wrap { max-height: 520px; overflow: auto; }
@@ -546,6 +588,50 @@
   /* year header row */
   thead th.year-th { background: #eef2f7; color: #1f2430; font-weight: 800; letter-spacing: .5px; }
   .gap-col { background: repeating-linear-gradient(45deg,#f7f8fa,#f7f8fa 4px,#eef0f3 4px,#eef0f3 8px); width: 8px; padding: 0 !important; border-top: none; border-bottom: none; }
+  /* 报告：当前月标识 */
+  th.cur-month {
+    background: linear-gradient(180deg, #d6001c, #a80016) !important; color: #fff !important;
+    font-weight: 800; box-shadow: inset 0 -3px 0 #fbbf24; position: relative;
+  }
+  th.cur-month .cur-tag {
+    display: block; font-size: 10px; font-weight: 700; letter-spacing: .5px;
+    color: #fde68a; line-height: 1.1; margin-top: 2px;
+  }
+  td.cur-month-cell {
+    background: rgba(214,0,28,.07) !important;
+    box-shadow: inset 0 0 0 2px rgba(214,0,28,.35);
+    font-weight: 700;
+  }
+  th.total-th, td.total-cell { background: #f7f8fa; font-weight: 800; }
+  /* 可搜索下拉 */
+  .ss { position: relative; min-width: 140px; }
+  .ss input.ss-inp {
+    width: 100%; height: 32px; padding: 0 28px 0 8px; border: 1px solid #d7dbe2; border-radius: 6px;
+    font-size: 13px; font-family: inherit;
+  }
+  .ss input.ss-inp:disabled { background: #f7f8fa; color: var(--ink); }
+  .ss::after { content: "▾"; position: absolute; right: 8px; top: 7px; color: var(--muted); pointer-events: none; font-size: 11px; }
+  .ss-panel {
+    display: none; position: absolute; z-index: 30; left: 0; right: 0; top: calc(100% + 2px);
+    max-height: 180px; overflow: auto; background: #fff; border: 1px solid var(--line); border-radius: 8px; box-shadow: var(--shadow);
+  }
+  .ss.open .ss-panel { display: block; }
+  .ss-panel div { padding: 7px 10px; cursor: pointer; font-size: 13px; }
+  .ss-panel div:hover, .ss-panel div.on { background: #eef2ff; color: #4338ca; }
+  .ss-panel .empty { color: var(--muted); cursor: default; }
+  /* 更新风险弹框行编辑 */
+  .risk-edit-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .risk-edit-table th, .risk-edit-table td { border: 1px solid var(--line); padding: 6px; }
+  .risk-edit-table th { background: #f7f8fa; font-size: 12px; }
+  .risk-edit-table input { width: 100%; height: 30px; border: 1px solid #d7dbe2; border-radius: 5px; padding: 0 6px; font-size: 12px; }
+  .risk-edit-table .mini-btn {
+    width: 26px; height: 26px; border-radius: 6px; border: 1px solid #d7dbe2; background: #fff;
+    cursor: pointer; font-weight: 800; line-height: 1;
+  }
+  .risk-edit-table .mini-btn.add { color: var(--green); }
+  .risk-edit-table .mini-btn.del { color: var(--red); }
+  .radio-row { display: flex; gap: 24px; align-items: center; margin: 8px 0 14px; }
+  .radio-row label { display: flex; align-items: center; gap: 6px; font-weight: 600; cursor: pointer; }
 </style>
 </head>
 <body>
@@ -560,6 +646,7 @@
       <div class="group-label">业务协同</div>
       <a data-page="upload" class="active"><span class="ic">📤</span> 上传数据</a>
       <a data-page="report"><span class="ic">📊</span> 供需协同报告</a>
+      <a data-page="riskpart"><span class="ic">⚠</span> 风险零部件</a>
       <a data-page="map"><span class="ic">🗺️</span> 供需协同地图</a>
       <div class="group-label">数据维护</div>
       <a data-page="basic-entity"><span class="ic">🔧</span> Entity 和机型维护</a>
@@ -620,7 +707,9 @@
         </div>
 
         <div class="card">
-          <div class="card-head"><h3>数据列表</h3><span class="desc">横向为月份（按年份分组），纵向为 Entity / Engine / Meeting Date · 数据不分页，上下滚动查看</span></div>
+          <div class="card-head"><h3>数据列表</h3><span class="desc">横向为月份（按年份分组），纵向为 Entity / Engine / Meeting Date · 数据不分页，上下滚动查看</span>
+            <button class="btn btn-ghost btn-sm" onclick="exportUploadList()">⬇ 导出</button>
+          </div>
           <div class="card-body">
             <div class="table-wrap upload-wrap">
               <table id="uploadTable">
@@ -645,22 +734,21 @@
       <!-- ============ 供需协同报告 ============ -->
       <section class="page" id="page-report">
         <div class="card allow-overflow">
-          <div class="card-head"><h3>筛选条件</h3><span class="desc">组织 / 机型来源于「数据维护」中维护的信息</span></div>
+          <div class="card-head"><h3>筛选条件</h3><span class="desc">筛选条件影响当前页所有图、表数据的展示</span></div>
           <div class="card-body">
-            <div class="filters">
+            <div class="filters report-filters">
               <div class="field">
-                <label>需求年月 <span class="help" data-tip="每个筛选框最多可选择 24 个月的数据">?</span></label>
-                <div class="range"><input type="month" value="2026-01"><span>~</span><input type="month" value="2026-12"></div>
+                <label>需求年月 <span class="help" data-tip="年作为一级、月作为二级，可勾选多个月份，最多 24 个月">?</span></label>
+                <div class="ms ym" id="msYearMonth" data-placeholder="请选择年月"></div>
               </div>
-              <div class="field">
-                <label>组织</label>
-                <div class="ms" id="msOrg" data-placeholder="请选择组织"></div>
-              </div>
-              <div class="field">
-                <label>机型</label>
-                <div class="ms" id="msEngine" data-placeholder="请选择机型"></div>
-              </div>
-              <div class="btn-row">
+              <div class="field"><label>Consol</label><div class="ms" id="msConsol" data-placeholder="全部 Consol"></div></div>
+              <div class="field"><label>JV</label><div class="ms" id="msJV" data-placeholder="全部 JV"></div></div>
+              <div class="field"><label>BU</label><div class="ms" id="msBU" data-placeholder="全部 BU"></div></div>
+              <div class="field"><label>Entity</label><div class="ms" id="msEntity" data-placeholder="全部 Entity"></div></div>
+              <div class="field"><label>Application</label><div class="ms" id="msApp" data-placeholder="全部 Application"></div></div>
+              <div class="field"><label>Category</label><div class="ms" id="msCategory" data-placeholder="全部 Category"></div></div>
+              <div class="field"><label>Engine Platform</label><div class="ms" id="msPlatform" data-placeholder="全部 Platform"></div></div>
+              <div class="btn-row" style="align-self:flex-end">
                 <button class="btn btn-primary" onclick="alert('已按筛选条件刷新报告')">查询</button>
                 <button class="btn btn-default" onclick="alert('筛选条件已重置')">重置</button>
               </div>
@@ -670,9 +758,13 @@
         </div>
 
         <div class="report-pair pair-a">
-          <div class="pair-badge">Fcst Accuracy Tracking By Entity</div>
+          <div class="pair-badge">Bi-weekly Demand</div>
           <div class="card">
-            <div class="card-head"><h3>Fcst Accuracy Tracking By Entity.数据表</h3><span class="desc">数据年份：2026 年 · 有实际值展示实际值，无实际值展示最新一版预测值</span></div>
+            <div class="card-head"><h3>Bi-weekly Demand.堆积柱状图</h3><span class="desc">数据年份：2026 年 · Entity 堆积；柱段内显示数值，柱顶显示月合计</span></div>
+            <div class="card-body"><div class="chart" id="chart1" style="height:420px"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Bi-weekly Demand.数据表</h3><span class="desc">数据年份：2026 年 · 有实际值展示实际值，无实际值展示最新一版预测值</span></div>
             <div class="card-body">
               <div class="table-wrap scroll-rows"><table id="table1"><thead></thead><tbody></tbody></table></div>
               <div class="legend">
@@ -683,25 +775,60 @@
               </div>
             </div>
           </div>
-
-          <div class="card">
-            <div class="card-head"><h3>Fcst Accuracy Tracking By Entity.堆积柱状图</h3><span class="desc">数据年份：2026 年 · 以 Entity 维度汇总（堆积柱状图）</span></div>
-            <div class="card-body"><div class="chart" id="chart1"></div></div>
-          </div>
         </div>
 
         <div class="report-pair pair-b">
           <div class="pair-badge">Engine Plant M-2 MAPE By Entity</div>
+          <div class="card">
+            <div class="card-head"><h3>Engine Plant M-2 MAPE By Entity.正负林立柱状图</h3><span class="desc">数据年份：2026 年 · 含 0% 轴，大于 0 在轴上方，小于 0 在轴下方</span></div>
+            <div class="card-body"><div class="chart" id="chart2" style="height:380px"></div></div>
+          </div>
           <div class="card">
             <div class="card-head"><h3>Engine Plant M-2 MAPE By Entity.数据表</h3><span class="desc">数据年份：2026 年 · 展示各月 MAPE 百分比，可正可负</span></div>
             <div class="card-body">
               <div class="table-wrap scroll-rows"><table id="table2"><thead></thead><tbody></tbody></table></div>
             </div>
           </div>
+        </div>
+      </section>
 
-          <div class="card">
-            <div class="card-head"><h3>Engine Plant M-2 MAPE By Entity.正负林立柱状图</h3><span class="desc">数据年份：2026 年 · 含 0% 轴，大于 0 在轴上方，小于 0 在轴下方</span></div>
-            <div class="card-body"><div class="chart" id="chart2" style="height:380px"></div></div>
+      <!-- ============ 风险零部件 ============ -->
+      <section class="page" id="page-riskpart">
+        <div class="card allow-overflow">
+          <div class="card-head"><h3>风险零部件</h3><span class="desc">随「上传数据」上传的最新版本风险零件清单 · 地图节点悬浮同步展示</span>
+            <div class="btn-row">
+              <button class="btn btn-ghost btn-sm" onclick="tplRiskPart()">⬇ 下载模板</button>
+              <button class="btn btn-ghost btn-sm" onclick="exportRiskParts()">⬇ 导出风险信息</button>
+              <button class="btn btn-primary btn-sm" onclick="pickImport('风险零部件')">⬆ 导入</button>
+              <button class="btn btn-primary btn-sm" onclick="openRiskUpdate()">更新风险</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="filters report-filters" style="margin-bottom:16px">
+              <div class="field"><label>上传版本</label><div class="ms" id="rpFVersion" data-placeholder="全部版本"></div></div>
+              <div class="field"><label>Entity</label><div class="ms" id="rpFEntity" data-placeholder="全部 Entity"></div></div>
+              <div class="field"><label>零件号</label><div class="ms" id="rpFPartNo" data-placeholder="全部零件号"></div></div>
+              <div class="field"><label>零部件名称</label><div class="ms" id="rpFName" data-placeholder="全部名称"></div></div>
+              <div class="field"><label>风险描述</label><div class="ms" id="rpFDesc" data-placeholder="全部描述"></div></div>
+              <div class="field"><label>影响</label><div class="ms" id="rpFImpact" data-placeholder="全部影响"></div></div>
+              <div class="btn-row" style="align-self:flex-end">
+                <button class="btn btn-primary btn-sm" onclick="filterRiskParts()">查询</button>
+                <button class="btn btn-default btn-sm" onclick="resetRiskFilters()">重置</button>
+              </div>
+            </div>
+            <div class="table-wrap"><table id="riskPartTable">
+              <thead><tr>
+                <th style="width:56px">序号</th>
+                <th>Meeting Date</th>
+                <th>Entity</th>
+                <th style="text-align:left">零件号</th>
+                <th style="text-align:left">零部件名称</th>
+                <th style="text-align:left">风险描述</th>
+                <th style="text-align:left">影响</th>
+              </tr></thead>
+              <tbody></tbody>
+            </table></div>
+            <div class="pager" id="riskPartPager"></div>
           </div>
         </div>
       </section>
@@ -732,13 +859,14 @@
             <span class="ck-corner bl"></span><span class="ck-corner br"></span>
             <span class="ck-scan"></span>
             <div id="mapChart"></div>
-            <div class="ck-left">
-              <h4><span class="blink"></span>活跃协同链路</h4>
-              <div id="ckRoutes"></div>
-            </div>
-            <div class="ck-side">
-              <h4><span class="blink"></span>风险零件预警 · 最新版</h4>
-              <div id="ckAlerts"></div>
+            <div class="ck-side" id="ckSidePanel">
+              <h4 onclick="toggleCkAlerts()" title="点击折叠/展开" style="cursor:pointer;user-select:none">
+                <span class="blink"></span>风险零件预警 · 最新版
+                <span class="ck-fold" id="ckFoldIcon">▾</span>
+              </h4>
+              <div class="ck-alerts-wrap" id="ckAlertsWrap">
+                <div id="ckAlerts"></div>
+              </div>
             </div>
           </div>
 
@@ -761,7 +889,7 @@
       <!-- ============ 数据维护 · Entity 和机型维护 ============ -->
       <section class="page" id="page-basic-entity">
         <div class="card">
-          <div class="card-head"><h3>维护 Entity 与机型</h3><span class="desc">每个 Entity 下维护其机型清单及机型属性（燃油/燃气、轻型/重型/其它）与备注</span>
+          <div class="card-head"><h3>维护 Entity 与机型</h3><span class="desc">每个 Entity 下维护 Application / Category / Engine Platform（可搜索选择）与备注</span>
             <div class="btn-row">
               <button class="btn btn-ghost btn-sm" onclick="tplEntity()">⬇ 下载模板</button>
               <button class="btn btn-default btn-sm" onclick="pickImport('Entity与机型')">⬆ 导入</button>
@@ -807,7 +935,7 @@
           </div>
           <div class="card-body">
             <div class="table-wrap"><table id="addrTable">
-              <thead><tr><th style="width:60px">序号</th><th style="text-align:left">简称</th><th style="text-align:left">全称</th><th style="text-align:left">具体地址</th><th>经度</th><th>纬度</th><th style="width:160px">操作</th></tr></thead>
+              <thead><tr><th style="width:90px">序号</th><th style="text-align:left">简称</th><th style="text-align:left">全称</th><th style="text-align:left">具体地址</th><th>经度</th><th>纬度</th><th style="width:200px">操作</th></tr></thead>
               <tbody></tbody>
             </table></div>
             <div class="pager" id="addrPager"></div>
@@ -818,24 +946,18 @@
       <!-- ============ 数据维护 · 供需协同关系 ============ -->
       <section class="page" id="page-basic-relation">
         <div class="card">
-          <div class="card-head"><h3>维护供需协同关系</h3><span class="desc">协同关系（产品/信息流/实物流）+ 风险零件（随「上传数据」上传，地图悬浮展示最新版本）</span>
+          <div class="card-head"><h3>维护供需协同关系</h3><span class="desc">协同关系（产品 / 信息流 / 实物流），用于地图连线悬浮展示</span>
             <div class="btn-row">
               <button class="btn btn-ghost btn-sm" onclick="tplRelation()">⬇ 下载模板</button>
               <button class="btn btn-default btn-sm" onclick="pickImport('供需协同关系')">⬆ 上传</button>
             </div>
           </div>
           <div class="card-body">
-            <div class="rel-sec-title">① 供需协同关系主表<span class="rel-sub">连线悬浮展示的「产品 / 信息流 / 实物流」，人工维护</span>
+            <div class="rel-sec-title">供需协同关系主表<span class="rel-sub">连线悬浮展示的「产品 / 信息流 / 实物流」，人工维护</span>
               <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="openRelEdit(-1)">+ 新增关系</button>
             </div>
             <div class="table-wrap"><table id="relMainTable">
               <thead><tr><th style="width:56px">序号</th><th>关系ID</th><th>供方Entity</th><th>需方Entity</th><th style="text-align:left">产品</th><th style="text-align:left">信息流</th><th style="text-align:left">实物流</th><th>状态</th><th style="width:130px">操作</th></tr></thead>
-              <tbody></tbody>
-            </table></div>
-
-            <div class="rel-sec-title" style="margin-top:22px">② 风险零件（最新版本）<span class="rel-sub">随「上传数据」上传，此处展示各协同关系最新 Meeting Date 版本</span></div>
-            <div class="table-wrap"><table id="relRiskTable">
-              <thead><tr><th style="width:56px">序号</th><th>上传版本(Meeting Date)</th><th>供方Entity</th><th>需方Entity</th><th style="text-align:left">零件名称</th><th style="text-align:left">风险描述</th></tr></thead>
               <tbody></tbody>
             </table></div>
           </div>
@@ -917,8 +1039,7 @@
         <label>Meeting Date（选择年月日）</label>
         <input type="date" id="meetingDate">
       </div>
-      <div class="info-row"><span>本次更新人</span><span id="modUser">Zhang Hui</span></div>
-      <div class="info-row"><span>更新时间</span><span id="modTime">--</span></div>
+      <div class="info-row"><span>更新 Entity</span><span id="modEntity">--</span></div>
       <div class="form-item" style="margin-top:20px;">
         <label>选择模板文件</label>
         <div class="drop-zone" id="dropZone" onclick="pickFile()">
@@ -928,14 +1049,42 @@
         <input type="file" id="fileInput" accept=".xlsx,.xls" style="display:none" onchange="onFilePicked()">
       </div>
     </div>
-    <div class="modal-body roomy" id="uploadStep3" style="display:none;">
-      <div style="font-size:14px;margin-bottom:10px;">上传进度 <span id="pctText">0%</span></div>
-      <div class="progress"><div class="bar" id="progressBar"></div></div>
-      <p class="hint" id="progressHint">正在上传，请稍候…</p>
-    </div>
     <div class="modal-foot" id="uploadFoot">
       <button class="btn btn-default" onclick="closeUpload()">取消</button>
       <button class="btn btn-primary" id="uploadNextBtn" onclick="uploadNext()">开始上传</button>
+    </div>
+  </div>
+</div>
+
+<!-- 更新风险弹框 -->
+<div class="modal-mask" id="riskUpdateMask">
+  <div class="modal xl">
+    <div class="modal-head"><span>更新风险</span><span class="x" onclick="closeRiskUpdate()">✕</span></div>
+    <div class="modal-body roomy">
+      <div class="form-item"><label>是否有风险</label>
+        <div class="radio-row">
+          <label><input type="radio" name="hasRisk" value="0" checked onchange="onHasRiskChange()">否</label>
+          <label><input type="radio" name="hasRisk" value="1" onchange="onHasRiskChange()">是</label>
+        </div>
+      </div>
+      <div class="form-item" id="riskNoDateWrap">
+        <label>Meeting Date</label>
+        <input type="date" id="riskNoMeetingDate">
+      </div>
+      <div id="riskUpdateRows" style="display:none">
+        <p class="hint" style="margin-top:0">请填写风险信息，可用 + / − 增减行（Entity 固定为当前用户所属，不可编辑）：</p>
+        <div class="table-wrap"><table class="risk-edit-table" id="riskEditTable">
+          <thead><tr>
+            <th style="width:44px">操作</th>
+            <th style="width:140px">Meeting Date</th><th>Entity</th><th>零件号</th><th>零部件名称</th><th>风险描述</th><th>影响</th>
+          </tr></thead>
+          <tbody id="riskEditBody"></tbody>
+        </table></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-default" onclick="closeRiskUpdate()">取消</button>
+      <button class="btn btn-primary" onclick="saveRiskUpdate()">确定</button>
     </div>
   </div>
 </div>
@@ -1109,8 +1258,8 @@
 const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const ENTITIES = ["ACPL","BFCEC","CCEC","DCEC","GCIC"];
 const CURRENT_USER = "Zhang Hui";
+const CURRENT_USER_ENTITY = "ACPL"; // 当前登录用户所属 Entity
 document.getElementById("userName").textContent = CURRENT_USER;
-document.getElementById("modUser").textContent = CURRENT_USER;
 
 function pad(n){ return n<10 ? "0"+n : ""+n; }
 function beijingNow(){
@@ -1125,6 +1274,7 @@ tickClock(); setInterval(tickClock, 30000);
 /* ================= Navigation ================= */
 const crumbMap = {
   upload:["上传数据","Data Upload"], report:["供需协同报告","Collaboration Report"],
+  riskpart:["风险零部件","Risk Parts"],
   map:["供需协同地图","Collaboration Map"],
   "basic-entity":["Entity 和机型维护","Entity & Engine"],
   "basic-org":["组织层级关系","Org Hierarchy"],
@@ -1188,34 +1338,56 @@ function renderYearHeader(span){
 (function buildUploadTable(){
   const span = buildMonthSpan(2025, 7, 18); // 2025-08 ~ 2026-12（跨年演示）
   document.getElementById("uploadYearRow").insertAdjacentHTML("beforeend", renderYearHeader(span));
+  document.getElementById("uploadYearRow").insertAdjacentHTML("beforeend", `<th class="total-th" rowspan="2">Total</th>`);
   document.getElementById("uploadMonthRow").innerHTML = span.map(s=>`<th>${s.label}</th>`).join("");
   const engines = ["4.5FE","NS6","Frodo","Fencer","15N"];
   const tbody = document.querySelector("#uploadTable tbody");
   tbody.innerHTML = ENTITIES.map((e,i)=>{
-    const cells = span.map(()=>`<td>${(Math.random()*2000+500).toFixed(0)}</td>`).join("");
-    return `<tr><td class="sticky-col">${e}</td><td>${engines[i%engines.length]}</td><td>2026-${pad((i%12)+1)}-15</td>${cells}</tr>`;
+    const vals = span.map(()=>+(Math.random()*2000+500).toFixed(0));
+    const total = vals.reduce((a,b)=>a+b,0);
+    const cells = vals.map(v=>`<td>${v}</td>`).join("");
+    return `<tr><td class="sticky-col">${e}</td><td>${engines[i%engines.length]}</td><td>2026-${pad((i%12)+1)}-15</td>${cells}<td class="total-cell">${total}</td></tr>`;
   }).join("");
 })();
 function queryUpload(){ /* demo */ alert("已按当前筛选条件查询"); }
 function resetUpload(){ document.querySelectorAll("#page-upload input").forEach(i=>{ if(i.type==="month"){} }); alert("筛选条件已重置"); }
 function downloadTemplate(){ alert("开始下载数据模板 Template.xlsx"); }
+function exportUploadList(){
+  const table = document.getElementById("uploadTable");
+  if(!table){ alert("未找到数据列表"); return; }
+  if(typeof XLSX==="undefined"){ alert("导出组件未加载，请检查网络后重试。"); return; }
+  // 表头：第 1 行 Entity/Engine/Meeting Date + 年份合并；第 2 行月份
+  const head1 = [...table.querySelectorAll("#uploadYearRow th")].reduce((arr,th)=>{
+    const span = +th.getAttribute("colspan") || 1;
+    const rowspan = +th.getAttribute("rowspan") || 1;
+    const txt = th.textContent.trim();
+    if(rowspan===2){ arr.push(txt); }
+    else { arr.push(txt); for(let i=1;i<span;i++) arr.push(""); }
+    return arr;
+  }, []);
+  const head2 = ["","","", ...[...table.querySelectorAll("#uploadMonthRow th")].map(th=>th.textContent.trim())];
+  const body = [...table.querySelectorAll("tbody tr")].map(tr=>
+    [...tr.children].map(td=>td.textContent.trim())
+  );
+  dlWorkbook("上传数据列表_导出.xlsx", [{
+    name:"数据列表",
+    rows:[head1, head2, ...body],
+    cols:[{wch:12},{wch:12},{wch:14}, ...Array(Math.max(head2.length-3,0)).fill({wch:8})]
+  }]);
+}
 
 /* ================= Upload modal flow ================= */
 function openUpload(){
-  document.getElementById("uploadStep1").style.display="block";
-  document.getElementById("uploadStep3").style.display="none";
-  document.getElementById("uploadFoot").style.display="flex";
   document.getElementById("fileName").textContent="";
-  document.getElementById("progressBar").style.width="0";
-  const hint=document.getElementById("progressHint"); hint.style.color=""; hint.textContent="正在上传，请稍候…";
   resetUploadBtn();
-  document.getElementById("modTime").textContent = fmtDateTime(beijingNow());
+  const entEl=document.getElementById("modEntity"); if(entEl) entEl.textContent=CURRENT_USER_ENTITY;
   const d=beijingNow(); document.getElementById("meetingDate").value=`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
   document.getElementById("uploadMask").classList.add("show");
 }
 function closeUpload(){ document.getElementById("uploadMask").classList.remove("show"); }
 function uploadNext(){
   if(!document.getElementById("meetingDate").value){ alert("请选择 Meeting Date"); return; }
+  if(!document.getElementById("fileInput").files[0]){ alert("请选择要上传的文件"); return; }
   startUpload();
 }
 function pickFile(){ document.getElementById("fileInput").click(); }
@@ -1230,36 +1402,19 @@ const UPLOAD_FAIL_REASONS = [
   "网络异常，与服务器连接中断"
 ];
 function startUpload(){
-  // 表单保持可见，在弹框下方展示进度条
-  document.getElementById("uploadStep3").style.display="block";
   const nextBtn=document.getElementById("uploadNextBtn");
   nextBtn.disabled=true; nextBtn.textContent="上传中…";
-  const bar=document.getElementById("progressBar"), txt=document.getElementById("pctText"), hint=document.getElementById("progressHint");
-  bar.style.width="0"; bar.style.background="linear-gradient(90deg, var(--red), #ff5a3c)";
-  hint.style.color=""; hint.textContent="正在上传，请稍候…";
   const willFail = Math.random() < 0.25;
-  const failAt = 40 + Math.floor(Math.random()*35); // 失败发生的进度点
-  let pct=0;
-  const timer=setInterval(()=>{
-    pct+=Math.random()*15+5;
-    if(willFail && pct>=failAt){
-      pct=failAt; clearInterval(timer);
-      bar.style.width=pct+"%"; txt.textContent=Math.floor(pct)+"%";
-      bar.style.background="#dc2626";
+  setTimeout(()=>{
+    resetUploadBtn();
+    closeUpload();
+    if(willFail){
       const reason=UPLOAD_FAIL_REASONS[Math.floor(Math.random()*UPLOAD_FAIL_REASONS.length)];
-      hint.style.color="#dc2626"; hint.textContent="上传失败："+reason;
-      setTimeout(()=>{ resetUploadBtn(); closeUpload(); alert("数据上传失败！\n失败原因："+reason); }, 900);
-      return;
+      alert("数据上传失败！\n失败原因："+reason);
+    } else {
+      alert("数据上传成功！\n更新 Entity："+CURRENT_USER_ENTITY);
     }
-    if(pct>=100){
-      pct=100; clearInterval(timer);
-      bar.style.width="100%"; txt.textContent="100%";
-      hint.textContent="上传完成！";
-      setTimeout(()=>{ resetUploadBtn(); closeUpload(); alert("数据上传成功！"); }, 700);
-      return;
-    }
-    bar.style.width=pct+"%"; txt.textContent=Math.floor(pct)+"%";
-  }, 280);
+  }, 800);
 }
 function resetUploadBtn(){
   const nextBtn=document.getElementById("uploadNextBtn");
@@ -1268,12 +1423,35 @@ function resetUploadBtn(){
 
 /* ================= Report ================= */
 const REPORT_YEAR = 2026;
+function contrastLabelColor(hex){
+  const h=(hex||"#888").replace("#","");
+  const full=h.length===3?h.split("").map(c=>c+c).join(""):h;
+  const r=parseInt(full.slice(0,2),16), g=parseInt(full.slice(2,4),16), b=parseInt(full.slice(4,6),16);
+  const L=(0.299*r+0.587*g+0.114*b)/255;
+  return L>0.58 ? "#1f2430" : "#ffffff";
+}
 function initReport(){
+  const now = beijingNow();
+  const curMonthIdx = (now.getFullYear()===REPORT_YEAR) ? now.getMonth() : -1; // 0-11，非报告年则不高亮
+  const monthHead = (m,idx)=> idx===curMonthIdx
+    ? `<th class="cur-month">${m}<span class="cur-tag">本月</span></th>`
+    : `<th>${m}</th>`;
+  const tdWrap = (idx, html)=> `<td>${html}</td>`; // 当前月仅高亮列名，数据行不加底色
+  const axisLabelOpt = {
+    formatter:(v,i)=> i===curMonthIdx ? `{cur|${v}}` : v,
+    rich:{ cur:{ color:"#fff", fontWeight:800, backgroundColor:"#d6001c", padding:[3,6], borderRadius:4 } }
+  };
+  const curMarkArea = curMonthIdx>=0 ? {
+    silent:true,
+    itemStyle:{ color:"rgba(214,0,28,.10)" },
+    data:[[{ xAxis: MONTHS[curMonthIdx] }, { xAxis: MONTHS[curMonthIdx] }]]
+  } : null;
+
   // ---- Table 1: Fcst Accuracy with color coding ----
   const head1 = document.querySelector("#table1 thead");
   head1.innerHTML =
     `<tr><th class="sticky-col" rowspan="2">Entity</th><th class="year-th" colspan="${MONTHS.length}">${REPORT_YEAR} 年</th></tr>`+
-    `<tr>${MONTHS.map(m=>`<th>${m}</th>`).join("")}</tr>`;
+    `<tr>${MONTHS.map((m,i)=>monthHead(m,i)).join("")}</tr>`;
   const body1 = document.querySelector("#table1 tbody");
   const chartSeriesData = {};
   const REPORT_ROWS = ENTITIES.slice(0, 15); // 最多展示 15 行 Entity
@@ -1285,67 +1463,95 @@ function initReport(){
       const val = Math.round(base);
       vals.push(val);
       if(isActual){
-        return `<td>${val}</td>`;
+        return tdWrap(idx, String(val));
       }
       // forecast: compare to previous version
       const diff = (Math.random()*1.2 - 0.4); // -40%..+80%
       const up = diff>=0;
       const abs = Math.abs(diff);
-      let cls="", badge="";
+      let cls="";
       if(abs>0.5){ cls="b-red"; }
       else if(abs>=0.3){ cls="b-amber"; }
       const arrow = up ? `<span class="arrow" style="color:#16a34a">▲</span>` : `<span class="arrow" style="color:#dc2626">▼</span>`;
       const inner = `${val}${(abs>=0.3)?arrow:""}`;
-      return cls ? `<td><span class="badge ${cls}">${inner}</span></td>` : `<td>${inner}</td>`;
+      return tdWrap(idx, cls ? `<span class="badge ${cls}">${inner}</span>` : inner);
     }).join("");
     chartSeriesData[e]=vals;
     return `<tr><td class="sticky-col">${e}</td>${cells}</tr>`;
   }).join("");
 
-  // ---- Chart 1: stacked bar by Entity ----
+  // ---- Chart 1: stacked bar by Entity；柱顶显示月合计 ----
   const palette = ["#d6001c","#2563eb","#16a34a","#f59e0b","#7c3aed"];
+  const monthTotals = MONTHS.map((_,mi)=> ENTITIES.reduce((s,e)=>s+(chartSeriesData[e]?chartSeriesData[e][mi]:0),0));
+  const stackSeries = ENTITIES.map((e,i)=>{
+    const color = palette[i%palette.length];
+    const labelColor = contrastLabelColor(color);
+    return {
+      name:e, type:"bar", stack:"total", emphasis:{focus:"series"},
+      itemStyle:{color},
+      label:{
+        show:true, position:"inside", formatter:p=>p.value>=180?p.value:"",
+        color:labelColor, fontSize:11, fontWeight:700,
+        textBorderColor: labelColor==="#ffffff" ? "rgba(0,0,0,.35)" : "rgba(255,255,255,.55)",
+        textBorderWidth: 1
+      },
+      data:chartSeriesData[e],
+      ...(i===0 && curMarkArea ? {markArea:curMarkArea} : {})
+    };
+  });
   echarts.init(document.getElementById("chart1")).setOption({
-    title:{text:`${REPORT_YEAR} 年 · Fcst Accuracy Tracking By Entity`, left:"center", textStyle:{fontSize:13,color:"#374151"}},
+    title:{text:`Bi-weekly Demand`, left:"center", textStyle:{fontSize:13,color:"#374151"}},
     tooltip:{trigger:"axis", axisPointer:{type:"shadow"}},
     legend:{data:ENTITIES, top:26},
-    grid:{left:40,right:20,top:64,bottom:30},
-    xAxis:{type:"category", data:MONTHS},
+    grid:{left:50,right:30,top:70,bottom:36},
+    xAxis:{type:"category", data:MONTHS, axisLabel:axisLabelOpt},
     yAxis:{type:"value", name:"预测值/实际值"},
-    series: ENTITIES.map((e,i)=>({
-      name:e, type:"bar", stack:"total", emphasis:{focus:"series"},
-      itemStyle:{color:palette[i%palette.length]}, data:chartSeriesData[e]
-    }))
+    series: [
+      ...stackSeries,
+      // 透明顶层柱，仅用于在堆叠柱顶部标月合计
+      {
+        name:"__月合计__", type:"bar", stack:"total", silent:true,
+        itemStyle:{color:"transparent"},
+        emphasis:{disabled:true},
+        tooltip:{show:false},
+        label:{
+          show:true, position:"top", color:"#0f172a", fontWeight:800, fontSize:12,
+          formatter:p=>monthTotals[p.dataIndex]
+        },
+        data: MONTHS.map(()=>0)
+      }
+    ]
   });
 
-  // ---- Table 2: MAPE (pos/neg) ----
+  // ---- Table 2 / Chart 2: MAPE —— 仅展示当前月之前的月份（去掉本月及以后） ----
+  const mapeMonths = MONTHS.slice(0, curMonthIdx > 0 ? curMonthIdx : 6); // 去掉本月及以后（当前为 Jul → 仅 Jan–Jun）
   const head2 = document.querySelector("#table2 thead");
   head2.innerHTML =
-    `<tr><th class="sticky-col" rowspan="2">Entity</th><th class="year-th" colspan="${MONTHS.length}">${REPORT_YEAR} 年</th></tr>`+
-    `<tr>${MONTHS.map(m=>`<th>${m}</th>`).join("")}</tr>`;
+    `<tr><th class="sticky-col" rowspan="2">Entity</th><th class="year-th" colspan="${mapeMonths.length}">${REPORT_YEAR} 年</th></tr>`+
+    `<tr>${mapeMonths.map((m,i)=>monthHead(m,i)).join("")}</tr>`;
   const mapeData={};
   document.querySelector("#table2 tbody").innerHTML = REPORT_ROWS.map(e=>{
     const vals=[];
-    const cells=MONTHS.map(()=>{
+    const cells=mapeMonths.map((_,idx)=>{
       const v = +( (Math.random()*40-18).toFixed(1) );
       vals.push(v);
       const color = v>=0 ? "#dc2626" : "#2563eb";
-      return `<td style="color:${color};font-weight:600">${v>0?"+":""}${v}%</td>`;
+      return tdWrap(idx, `<span style="color:${color};font-weight:600">${v>0?"+":""}${v}%</span>`);
     }).join("");
     mapeData[e]=vals;
     return `<tr><td class="sticky-col">${e}</td>${cells}</tr>`;
   }).join("");
 
-  // ---- Chart 2: bars around 0% axis (月份之间加分隔条带) ----
+  // ---- Chart 2: bars around 0% axis ----
   echarts.init(document.getElementById("chart2")).setOption({
-    title:{text:`${REPORT_YEAR} 年 · Engine Plant M-2 MAPE By Entity`, left:"center", textStyle:{fontSize:13,color:"#374151"}},
+    title:{text:`Engine Plant M-2 MAPE By Entity`, left:"center", textStyle:{fontSize:13,color:"#374151"}},
     tooltip:{trigger:"axis", axisPointer:{type:"shadow"}, valueFormatter:v=>v+"%"},
     legend:{data:ENTITIES, top:26},
     grid:{left:50,right:20,top:64,bottom:30},
     xAxis:{
-      type:"category", data:MONTHS, axisLine:{onZero:true},
+      type:"category", data:mapeMonths, axisLine:{onZero:true},
       boundaryGap:true,
       axisTick:{alignWithLabel:true},
-      // 交替底色带，直观区分不同月份
       splitArea:{show:true, areaStyle:{color:["rgba(0,0,0,0.02)","rgba(37,99,235,0.05)"]}},
       splitLine:{show:true, lineStyle:{color:"#eef0f3"}}
     },
@@ -1382,9 +1588,16 @@ function initMap(){
     });
 }
 const CORE_NODES = ["CCS-WH","XCEC"];
-// 找某供需关系的最新版本风险零件
+// 找某供需关系的最新版本风险零件（供连线悬浮）
 function riskPartsFor(from, to){
-  const list = REL_RISK.filter(r=>r[1]===from && r[2]===to);
+  // 取与供方/需方任一相关的风险零件；优先最新上传版本
+  const list = REL_RISK.filter(r=>r[1]===from || r[1]===to);
+  if(!list.length) return [];
+  const latest = list.map(r=>r[0]).sort().reverse()[0];
+  return list.filter(r=>r[0]===latest);
+}
+function riskPartsByEntity(entity){
+  const list = REL_RISK.filter(r=>r[1]===entity);
   if(!list.length) return [];
   const latest = list.map(r=>r[0]).sort().reverse()[0];
   return list.filter(r=>r[0]===latest);
@@ -1396,26 +1609,55 @@ function collabLines(){
     rel:{ id:r[0], from:r[1], to:r[2], product:r[3], info:r[4], material:r[5], risks:riskPartsFor(r[1],r[2]) }
   }));
 }
-function futureForecastTable(entity){
-  const now=beijingNow(); let rows="";
+function entityHoverHtml(entity){
+  const cell = "padding:3px 6px;border:1px solid rgba(120,180,255,.25);text-align:center";
+  const th = cell+";background:rgba(40,90,150,.35);color:#d6ecff;font-weight:700";
+  const engines = (entityEngineData[entity]||[{platform:"NS6"},{platform:"4.5FE"}]).map(m=>m.platform).filter(Boolean).slice(0,3);
+  const engList = engines.length ? engines : ["NS6","4.5FE"];
+  // 未来 6 个月
+  const now=beijingNow();
+  const months=[];
   for(let i=1;i<=6;i++){
     const d=new Date(now.getFullYear(), now.getMonth()+i, 1);
-    rows+=`<tr><td style="padding:3px 10px;border:1px solid rgba(120,180,255,.25)">${d.getFullYear()}-${pad(d.getMonth()+1)}</td><td style="padding:3px 10px;border:1px solid rgba(120,180,255,.25);text-align:right;color:#7fe0ff;font-weight:700">${(Math.random()*2000+800).toFixed(0)}</td></tr>`;
+    months.push({y:d.getFullYear(), m:d.getMonth()+1, label:MONTHS[d.getMonth()]});
   }
-  return `<div style="font-weight:700;margin-bottom:6px;color:#eaf6ff">${entity} · 未来 6 个月最新版预测</div>
-    <table style="border-collapse:collapse;font-size:12px;color:#cfe4ff"><tr><th style="padding:3px 10px;border:1px solid rgba(120,180,255,.3)">月份</th><th style="padding:3px 10px;border:1px solid rgba(120,180,255,.3)">${entity}</th></tr>${rows}</table>`;
+  // 表头：Engine 跨两行；后面 6 个月第一行年份(同年度合并)、第二行月份
+  let yearCells="", i=0;
+  while(i<months.length){
+    let j=i; while(j<months.length && months[j].y===months[i].y) j++;
+    yearCells += `<th style="${th}" colspan="${j-i}">${months[i].y}</th>`;
+    i=j;
+  }
+  const monthCells = months.map(m=>`<th style="${th}">${m.label}</th>`).join("");
+  const fcRows = engList.map(eng=>{
+    const vals = months.map(()=>`<td style="${cell};color:#7fe0ff;font-weight:700">${(Math.random()*1200+400).toFixed(0)}</td>`).join("");
+    return `<tr><td style="${cell};font-weight:700;color:#eaf6ff;text-align:left;white-space:nowrap">${eng}</td>${vals}</tr>`;
+  }).join("");
+  // 风险零件：更新时间、Part No、风险描述、影响（布局适配宽表）
+  const risks = riskPartsByEntity(entity);
+  let riskRows = risks.map(r=>
+    `<tr><td style="${cell}">${r[0]}</td><td style="${cell};white-space:nowrap">${r[2]}</td><td style="${cell};text-align:left;max-width:200px;white-space:normal;color:#ffd0d8">${r[4]}</td><td style="${cell};color:#ff9fb0;white-space:nowrap">${r[5]}</td></tr>`
+  ).join("");
+  if(!riskRows) riskRows = `<tr><td colspan="4" style="${cell};color:#8fb8e6">暂无风险零件</td></tr>`;
+  return `<div style="font-weight:800;margin-bottom:8px;color:#eaf6ff;font-size:14px">${entity}</div>
+    <div style="font-weight:700;margin:0 0 4px;color:#9fd0ff;font-size:12px">未来 6 个月最新版预测</div>
+    <table style="border-collapse:collapse;font-size:11px;color:#cfe4ff;margin-bottom:10px;min-width:420px">
+      <tr><th style="${th}" rowspan="2">Engine</th>${yearCells}</tr>
+      <tr>${monthCells}</tr>
+      ${fcRows}
+    </table>
+    <div style="font-weight:700;margin:0 0 4px;color:#ff9fb0;font-size:12px">风险零件</div>
+    <table style="border-collapse:collapse;font-size:11px;color:#cfe4ff;width:100%">
+      <tr><th style="${th}">更新时间</th><th style="${th}">Part No</th><th style="${th}">风险描述</th><th style="${th}">影响</th></tr>${riskRows}
+    </table>`;
 }
 function lineTooltip(rel){
   const cell = "padding:3px 10px;border:1px solid rgba(120,180,255,.25)";
-  const riskTxt = rel.risks.length
-    ? rel.risks.map(r=>`${r[3]}：${r[4]}`).join("；")
-    : "暂无风险零件";
   return `<div style="font-weight:700;margin-bottom:6px;color:#eaf6ff">${rel.from} → ${rel.to} 供需协同 <span style="color:#7fb4ff;font-weight:500">(${rel.id})</span></div>
     <table style="border-collapse:collapse;font-size:12px;color:#cfe4ff">
       <tr><td style="${cell}">产品</td><td style="${cell}">${rel.product}</td></tr>
       <tr><td style="${cell}">信息流</td><td style="${cell}">${rel.info}</td></tr>
       <tr><td style="${cell}">实物流</td><td style="${cell}">${rel.material}</td></tr>
-      <tr><td style="${cell};color:#ff9fb0;font-weight:700">风险零件</td><td style="${cell};color:#ff9fb0;max-width:280px;white-space:normal">${riskTxt}</td></tr>
     </table>`;
 }
 function renderMap(chart){
@@ -1434,8 +1676,8 @@ function renderMap(chart){
       extraCssText:"box-shadow:0 12px 40px rgba(0,0,0,.55),0 0 24px rgba(56,180,255,.25);border-radius:10px;backdrop-filter:blur(6px);",
       formatter:(p)=>{
         if(p.seriesType==="lines"){ return lineTooltip(p.data.rel); }
-        if(CORE_NODES.includes(p.name)){ return futureForecastTable(p.name); }
-        return `<b style="color:#eaf6ff;font-size:14px">${p.name}</b><br><span style="color:#8fb8e6">经纬度：${p.value[0]}, ${p.value[1]}</span>`;
+        if(p.seriesType==="effectScatter" || p.seriesType==="scatter"){ return entityHoverHtml(p.name); }
+        return `<b style="color:#eaf6ff;font-size:14px">${p.name||""}</b>`;
       }
     },
     geo:{
@@ -1526,26 +1768,27 @@ function renderCockpit(){
   const prov=new Set(Object.values(ENTITY_GEO).map(c=>c.join(","))).size;
   const map={nodes,links,risk,models,orgs,prov};
   document.querySelectorAll("#ckKpis [data-kpi]").forEach(el=>{ countUp(el, map[el.dataset.kpi]||0); });
-  // 左侧活跃链路
-  const routes=document.getElementById("ckRoutes");
-  if(routes){
-    const active=REL_MAIN.filter(r=>r[6]!=="停用").slice(0,5);
-    routes.innerHTML = active.map(r=>
-      `<div class="ck-route"><div><b>${r[1]}</b> <span class="cr-arrow">⟶</span> <b>${r[2]}</b><div class="cr-id">${r[0]} · ${r[3]}</div></div></div>`
-    ).join("") || `<div class="ck-route"><div>暂无启用协同关系</div></div>`;
-  }
-  // 右侧预警列表
+  // 左侧活跃链路面板已移除
+  // 右侧预警列表（自动上下滚动；内容复制一份做无缝循环）
   const al=document.getElementById("ckAlerts");
   if(al){
-    al.innerHTML = REL_RISK.slice(0,4).map(r=>
-      `<div class="ck-alert"><div class="ca-head">⚠ ${r[3]}</div><div>${r[4]}</div><div class="ca-route">${r[1]} → ${r[2]} · ${r[0]}</div></div>`
-    ).join("") || `<div class="ck-alert" style="border-left-color:#34e5a0;background:rgba(20,44,36,.5);color:#bff0d8"><div class="ca-head" style="color:#7fe6b6">✓ 暂无风险零件预警</div></div>`;
+    const items = REL_RISK.length
+      ? REL_RISK.map(r=>
+          `<div class="ck-alert"><div class="ca-head">⚠ ${r[3]}（${r[2]}）</div><div>${r[4]}</div><div class="ca-route">${r[1]} · ${r[0]} · 影响：${r[5]}</div></div>`
+        ).join("")
+      : `<div class="ck-alert" style="border-left-color:#34e5a0;background:rgba(20,44,36,.5);color:#bff0d8"><div class="ca-head" style="color:#7fe6b6">✓ 暂无风险零件预警</div></div>`;
+    al.innerHTML = items + (REL_RISK.length>2 ? items : "");
+    al.classList.toggle("ck-scroll", REL_RISK.length>2);
   }
   // 实时时钟
   if(ckClockTimer) clearInterval(ckClockTimer);
   const tick=()=>{ const el=document.getElementById("ckClock"); if(el){ const d=beijingNow();
     el.innerHTML=`<span class="live">ONLINE</span>北京时间 <b>${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}</b>`; } };
   tick(); ckClockTimer=setInterval(tick,1000);
+}
+function toggleCkAlerts(){
+  const panel=document.getElementById("ckSidePanel");
+  if(panel) panel.classList.toggle("collapsed");
 }
 
 /* ================= Basic data trees ================= */
@@ -1563,38 +1806,50 @@ function treeNode(label, children, lvlClass, tagText, tagLvl){
 const entities3 = ["CDBSCES","CCS-TT","CCS-VT","CCS-WH","e-Mobility","ECJV","CCS-E&S","CPGC","CGTC","DCES","BFCES","CUMEQ","BFCEC","ACPL","DCEC","GCIC","XCEC","CCEC"];
 const orgHalf = Math.ceil(entities3.length/2);
 const orgTreeData = [
-  {name:"Consol", tag:"一级", tl:1, children:[
-    {name:"CBU", tag:"BU", tl:2, children: entities3.slice(0,orgHalf).map(n=>({name:n, tag:"Entity", tl:3, children:[]}))},
-    {name:"PSBU", tag:"BU", tl:2, children: entities3.slice(orgHalf).map(n=>({name:n, tag:"Entity", tl:3, children:[]}))}
+  {name:"Consol", tag:"一级", tl:1, disabled:false, children:[
+    {name:"CBU", tag:"BU", tl:2, disabled:false, children: entities3.slice(0,orgHalf).map(n=>({name:n, tag:"Entity", tl:3, disabled:false, children:[]}))},
+    {name:"PSBU", tag:"BU", tl:2, disabled:false, children: entities3.slice(orgHalf).map(n=>({name:n, tag:"Entity", tl:3, disabled:false, children:[]}))}
   ]},
-  {name:"JV", tag:"一级", tl:1, children:[
-    {name:"EBU", tag:"BU", tl:2, children:[{name:"ECJV", tag:"Entity", tl:3, children:[]}]}
+  {name:"JV", tag:"一级", tl:1, disabled:false, children:[
+    {name:"EBU", tag:"BU", tl:2, disabled:false, children:[{name:"ECJV", tag:"Entity", tl:3, disabled:false, children:[]}]}
   ]}
 ];
+/** 同级内：有效在前、失效沉底 */
+function sinkDisabled(arr, isOff){
+  if(!arr || !arr.length) return;
+  arr.sort((a,b)=> (isOff(a)?1:0) - (isOff(b)?1:0));
+}
 function renderOrgNode(node, path, seq){
   const hasKids = node.children && node.children.length;
   const caret = hasKids ? `<span class="caret">▾</span>` : `<span class="caret" style="opacity:0">•</span>`;
-  const lvlClass = node.tl===1?"lvl1":(node.tl===2?"lvl2":"lvl3");
+  const lvlClass = (node.tl===1?"lvl1":(node.tl===2?"lvl2":"lvl3")) + (node.disabled?" node-off":"");
   const tag = `<span class="tag ${node.tl===2?'l2':(node.tl===3?'l3':'')}">${node.tag}</span>`;
   const delBtn = hasKids
     ? `<span class="mini disabled" title="存在下级，不允许删除">删除</span>`
     : `<span class="mini del" onclick="orgDelete('${path}')">删除</span>`;
   // Entity 级（tl===3）不提供「新增下级」
   const addBtn = node.tl < 3 ? `<span class="mini" onclick="orgAdd('${path}')">+ 新增下级</span>` : "";
+  const offBtn = `<span class="mini off-toggle" onclick="orgToggle('${path}')">${node.disabled?"启用":"失效"}</span>`;
   const actions = `<span class="node-actions">
       ${addBtn}
       <span class="mini" onclick="orgEdit('${path}')">编辑</span>
+      ${offBtn}
       ${delBtn}
     </span>`;
   // Entity 级前加序号；BU 级后显示其 Entity 数量
   const seqPrefix = node.tl===3 ? `<span style="color:#9aa1ad;margin-right:4px">${seq}.</span>` : "";
   const countBadge = node.tl===2 ? `<span style="color:#6b7280;font-weight:600;margin-left:6px">（${hasKids?node.children.length:0} 个 Entity）</span>` : "";
-  let html = `<li class="${lvlClass}"><span class="node">${caret}${tag}${seqPrefix}<span>${node.name}</span>${countBadge}</span>${actions}`;
-  if(hasKids){ html += `<ul>${node.children.map((c,i)=>renderOrgNode(c, path+"."+i, i+1)).join("")}</ul>`; }
+  const offBadge = node.disabled ? `<span class="badge-off">已失效</span>` : "";
+  let html = `<li class="${lvlClass}"><span class="node">${caret}${tag}${seqPrefix}<span>${node.name}</span>${countBadge}${offBadge}</span>${actions}`;
+  if(hasKids){
+    sinkDisabled(node.children, c=>!!c.disabled);
+    html += `<ul>${node.children.map((c,i)=>renderOrgNode(c, path+"."+i, i+1)).join("")}</ul>`;
+  }
   html += `</li>`;
   return html;
 }
 function renderOrgTree(){
+  sinkDisabled(orgTreeData, n=>!!n.disabled);
   document.getElementById("entityTree").innerHTML = orgTreeData.map((n,i)=>renderOrgNode(n, ""+i, i+1)).join("");
   renderOrgStats();
 }
@@ -1616,12 +1871,22 @@ function orgNodeByPath(path){
 function orgAdd(path){
   const name = prompt("请输入新增下级节点名称："); if(!name) return;
   const node = orgNodeByPath(path); node.children = node.children||[];
-  node.children.push({name, tag:node.tl===1?"BU":"Entity", tl:Math.min(node.tl+1,3), children:[]});
+  node.children.push({name, tag:node.tl===1?"BU":"Entity", tl:Math.min(node.tl+1,3), disabled:false, children:[]});
+  sinkDisabled(node.children, c=>!!c.disabled);
   renderOrgTree();
 }
 function orgEdit(path){
   const node = orgNodeByPath(path);
   const name = prompt("修改节点名称：", node.name); if(name){ node.name=name; renderOrgTree(); }
+}
+function orgToggle(path){
+  const idx = path.split(".").map(Number);
+  const last = idx.pop();
+  let arr = orgTreeData; for(const i of idx){ arr = arr[i].children; }
+  const node = arr[last];
+  node.disabled = !node.disabled;
+  sinkDisabled(arr, n=>!!n.disabled);
+  renderOrgTree();
 }
 function orgDelete(path){
   const idx = path.split(".").map(Number);
@@ -1632,7 +1897,9 @@ function orgDelete(path){
 }
 function orgAddRoot(){
   const name = prompt("请输入新增一级节点名称（如 Consol / JV）："); if(!name) return;
-  orgTreeData.push({name, tag:"一级", tl:1, children:[]}); renderOrgTree();
+  orgTreeData.push({name, tag:"一级", tl:1, disabled:false, children:[]});
+  sinkDisabled(orgTreeData, n=>!!n.disabled);
+  renderOrgTree();
 }
 // 展开全部
 function orgExpandAll(){
@@ -1654,17 +1921,18 @@ function orgCollapseLeaf(){
   });
 }
 renderOrgTree();
-// Entity 与机型维护（每个 Entity 下机型以 Excel 表形式维护，含燃料/类型/备注）
-const FUEL_TYPES = ["燃油","燃气","其它"];
-const SIZE_TYPES = ["轻型","重型","其它"];
-// {model, fuel, size, note}
+// Entity 与机型维护（Application / Category / Engine Platform + 备注）
+const APP_OPTS = ["On-highway","Off-highway","Industrial","Powergen"];
+const CAT_OPTS = ["Light Duty","Medium Duty","Heavy Duty","Others"];
+const PLATFORM_OPTS = ["4.5FE","NS6","Frodo","Fencer","15N","15NFE","Off-highway","NO-NS6"];
+// {app, category, platform, note, disabled}
 let entityEngineData = {
-  "BFCEC":[{model:"4.5FE",fuel:"燃油",size:"轻型",note:""},{model:"NS6",fuel:"燃油",size:"重型",note:"主力国六机型"}],
-  "ACPL":[{model:"Frodo",fuel:"燃气",size:"重型",note:""},{model:"Fencer",fuel:"燃气",size:"重型",note:""}],
-  "DCEC":[{model:"NS6",fuel:"燃油",size:"重型",note:""},{model:"NO-NS6",fuel:"燃油",size:"重型",note:"非国六出口型"}],
-  "GCIC":[{model:"Off-highway",fuel:"其它",size:"其它",note:"非道路"},{model:"15N",fuel:"燃气",size:"轻型",note:""}],
-  "XCEC":[{model:"15NFE",fuel:"燃气",size:"轻型",note:""},{model:"Frodo",fuel:"燃气",size:"重型",note:""}],
-  "CCEC":[{model:"4.5FE",fuel:"燃油",size:"轻型",note:""},{model:"Fencer",fuel:"燃气",size:"重型",note:""}]
+  "BFCEC":[{app:"On-highway",category:"Light Duty",platform:"4.5FE",note:"",disabled:false},{app:"On-highway",category:"Heavy Duty",platform:"NS6",note:"主力国六机型",disabled:false}],
+  "ACPL":[{app:"On-highway",category:"Heavy Duty",platform:"Frodo",note:"",disabled:false},{app:"On-highway",category:"Heavy Duty",platform:"Fencer",note:"",disabled:false}],
+  "DCEC":[{app:"On-highway",category:"Heavy Duty",platform:"NS6",note:"",disabled:false},{app:"On-highway",category:"Heavy Duty",platform:"NO-NS6",note:"非国六出口型",disabled:false}],
+  "GCIC":[{app:"Off-highway",category:"Others",platform:"Off-highway",note:"非道路",disabled:false},{app:"Industrial",category:"Light Duty",platform:"15N",note:"",disabled:false}],
+  "XCEC":[{app:"Industrial",category:"Light Duty",platform:"15NFE",note:"",disabled:false},{app:"On-highway",category:"Heavy Duty",platform:"Frodo",note:"",disabled:false}],
+  "CCEC":[{app:"On-highway",category:"Light Duty",platform:"4.5FE",note:"",disabled:false},{app:"On-highway",category:"Heavy Duty",platform:"Fencer",note:"",disabled:false}]
 };
 // 界面级编辑/保存：编辑时基于草稿修改，未保存离开会提示且不更新数据
 let engineEditing = false;
@@ -1674,6 +1942,33 @@ function cloneEngine(obj){ return JSON.parse(JSON.stringify(obj)); }
 function selectHtml(options, val, dis){
   return `<select ${dis?"disabled":""}>${options.map(o=>`<option ${o===val?"selected":""}>${o}</option>`).join("")}</select>`;
 }
+// 可搜索下拉（编辑态）/ 只读文本
+function ssHtml(options, val, disabled){
+  if(disabled) return `<span class="cell-ro">${val||"-"}</span>`;
+  const opts = JSON.stringify(options).replace(/"/g,"&quot;");
+  return `<div class="ss" data-opts="${opts}"><input class="ss-inp" value="${val||""}" placeholder="搜索选择…" autocomplete="off"><div class="ss-panel"></div></div>`;
+}
+function bindSearchSelects(root){
+  (root||document).querySelectorAll(".ss").forEach(ss=>{
+    if(ss.dataset.bound) return; ss.dataset.bound="1";
+    const inp=ss.querySelector(".ss-inp"), panel=ss.querySelector(".ss-panel");
+    let opts=[]; try{ opts=JSON.parse(ss.dataset.opts.replace(/&quot;/g,'"')); }catch(e){ opts=[]; }
+    function paint(q){
+      const qq=(q||"").toLowerCase();
+      const list=opts.filter(o=>!qq || String(o).toLowerCase().includes(qq));
+      panel.innerHTML = list.length
+        ? list.map(o=>`<div class="${o===inp.value?'on':''}" data-v="${o}">${o}</div>`).join("")
+        : `<div class="empty">无匹配项</div>`;
+    }
+    inp.addEventListener("focus",()=>{ ss.classList.add("open"); paint(inp.value); });
+    inp.addEventListener("input",()=> paint(inp.value));
+    panel.addEventListener("mousedown",(e)=>{
+      const it=e.target.closest("div[data-v]"); if(!it) return;
+      e.preventDefault(); inp.value=it.dataset.v; ss.classList.remove("open");
+    });
+    document.addEventListener("click",(e)=>{ if(!ss.contains(e.target)) ss.classList.remove("open"); });
+  });
+}
 // 将草稿区块内当前编辑框的值同步回草稿
 function collectAllBlocks(){
   if(!engineEditing) return;
@@ -1681,9 +1976,10 @@ function collectAllBlocks(){
     const ent = block.dataset.ent;
     block.querySelectorAll("tbody tr[data-idx]").forEach(tr=>{
       const idx=+tr.dataset.idx;
-      const selects=tr.querySelectorAll("select"), inputs=tr.querySelectorAll("input");
+      const ss=tr.querySelectorAll(".ss-inp"), note=tr.querySelector("input.note-inp");
       if(engineDraft[ent] && engineDraft[ent][idx]){
-        engineDraft[ent][idx]={ size:selects[0].value, fuel:selects[1].value, model:inputs[0].value, note:inputs[1].value };
+        const prev = engineDraft[ent][idx];
+        engineDraft[ent][idx]={ app:ss[0]?ss[0].value:"", category:ss[1]?ss[1].value:"", platform:ss[2]?ss[2].value:"", note:note?note.value:"", disabled:!!prev.disabled };
       }
     });
   });
@@ -1698,30 +1994,34 @@ function renderEntityEngine(){
        <button class="btn btn-primary btn-sm" onclick="saveEngine()">保存</button>
        <button class="btn btn-default btn-sm" onclick="cancelEngine()">取消</button>`
     : `<button class="btn btn-default btn-sm" onclick="editEngine()">编辑</button>`;
-  const dis = editing ? "" : "disabled";
   const wrap = document.getElementById("entityEngineMaint");
   const entCount = Object.keys(src).length;
   const modelCount = Object.values(src).reduce((a,ms)=>a+ms.length,0);
   const summary = `<div class="ee-summary">Entity 总数 <b>${entCount}</b> · 机型总数 <b>${modelCount}</b></div>`;
   const blocks = Object.entries(src).map(([ent,models])=>{
-    const rows = models.map((m,idx)=>
-      editing
-      ? `<tr data-idx="${idx}">
-        <td>${idx+1}</td>
-        <td>${selectHtml(SIZE_TYPES, m.size, false)}</td>
-        <td>${selectHtml(FUEL_TYPES, m.fuel, false)}</td>
-        <td style="text-align:left"><input value="${m.model}" placeholder="Engine 名称"></td>
-        <td style="text-align:left"><input class="note-inp" value="${m.note||""}" placeholder="机型备注"></td>
-        <td><span class="op-link gray" onclick="removeModel('${ent}',${idx})">删除</span></td>
+    sinkDisabled(models, m=>!!m.disabled);
+    const rows = models.map((m,idx)=>{
+      const offCls = m.disabled ? " class=\"row-off\"" : "";
+      const offBadge = m.disabled ? `<span class="badge-off">已失效</span>` : "";
+      const offBtn = `<span class="op-link gray" onclick="toggleModel('${ent}',${idx})">${m.disabled?"启用":"失效"}</span>`;
+      return editing
+      ? `<tr data-idx="${idx}"${offCls}>
+        <td>${idx+1}${offBadge}</td>
+        <td>${ssHtml(APP_OPTS, m.app, false)}</td>
+        <td>${ssHtml(CAT_OPTS, m.category, false)}</td>
+        <td>${ssHtml(PLATFORM_OPTS, m.platform, false)}</td>
+        <td style="text-align:left"><input class="note-inp" value="${m.note||""}" placeholder="备注"></td>
+        <td>${offBtn}<span class="op-link gray" onclick="removeModel('${ent}',${idx})">删除</span></td>
       </tr>`
-      : `<tr data-idx="${idx}">
-        <td>${idx+1}</td>
-        <td><span class="cell-ro">${m.size||"-"}</span></td>
-        <td><span class="cell-ro">${m.fuel||"-"}</span></td>
-        <td style="text-align:left"><span class="cell-ro">${m.model||"-"}</span></td>
+      : `<tr data-idx="${idx}"${offCls}>
+        <td>${idx+1}${offBadge}</td>
+        <td>${ssHtml(APP_OPTS, m.app, true)}</td>
+        <td>${ssHtml(CAT_OPTS, m.category, true)}</td>
+        <td>${ssHtml(PLATFORM_OPTS, m.platform, true)}</td>
         <td style="text-align:left"><span class="cell-ro">${m.note||""}</span></td>
-        <td><span class="op-link gray" style="opacity:.4;cursor:not-allowed">删除</span></td>
-      </tr>`).join("");
+        <td>${offBtn}<span class="op-link gray" style="opacity:.4;cursor:not-allowed">删除</span></td>
+      </tr>`;
+    }).join("");
     const blockBtns = editing
       ? `<button class="btn btn-primary btn-sm" onclick="addModel('${ent}')">+ 新增机型</button>
          <button class="btn btn-default btn-sm" onclick="removeEntity('${ent}')">删除 Entity</button>`
@@ -1735,21 +2035,26 @@ function renderEntityEngine(){
       </div>
       <div class="table-wrap"><table>
         <thead><tr>
-          <th style="width:56px">序号</th>
-          <th style="width:15%">类型</th>
-          <th style="width:15%">燃料</th>
-          <th style="text-align:left;width:24%">Engine</th>
+          <th style="width:90px">序号</th>
+          <th style="width:16%">Application</th>
+          <th style="width:16%">Category</th>
+          <th style="width:18%">Engine Platform</th>
           <th style="text-align:left">备注</th>
-          <th style="width:90px">操作</th>
+          <th style="width:130px">操作</th>
         </tr></thead>
         <tbody>${rows || `<tr><td colspan="6" style="color:#9aa1ad">暂无机型${editing?"，点击「新增机型」添加":""}</td></tr>`}</tbody>
       </table></div>
     </div>`;
   }).join("");
   wrap.innerHTML = summary + (blocks || `<p class="hint">暂无 Entity${editing?"，请点击右上角「新增 Entity」":""}。</p>`);
+  if(editing) bindSearchSelects(wrap);
 }
 function editEngine(){ engineEditing=true; engineDraft=cloneEngine(entityEngineData); renderEntityEngine(); }
-function saveEngine(){ collectAllBlocks(); entityEngineData=cloneEngine(engineDraft); engineEditing=false; engineDraft=null; renderEntityEngine(); alert("已保存"); }
+function saveEngine(){
+  collectAllBlocks();
+  Object.values(engineDraft).forEach(ms=> sinkDisabled(ms, m=>!!m.disabled));
+  entityEngineData=cloneEngine(engineDraft); engineEditing=false; engineDraft=null; renderEntityEngine(); alert("已保存");
+}
 function cancelEngine(){ engineEditing=false; engineDraft=null; renderEntityEngine(); }
 function addEntity(){
   const name = prompt("请输入新增的 Entity 名称："); if(!name) return;
@@ -1757,8 +2062,21 @@ function addEntity(){
   if(!engineDraft[name]){ engineDraft[name]=[]; renderEntityEngine(); } else { alert("该 Entity 已存在"); }
 }
 function removeEntity(ent){ collectAllBlocks(); if(confirm(`确认删除 Entity「${ent}」及其机型？`)){ delete engineDraft[ent]; renderEntityEngine(); } }
-function addModel(ent){ collectAllBlocks(); engineDraft[ent].push({model:"",fuel:"燃油",size:"轻型",note:""}); renderEntityEngine(); }
+function addModel(ent){
+  collectAllBlocks();
+  engineDraft[ent].push({app:"On-highway",category:"Light Duty",platform:"4.5FE",note:"",disabled:false});
+  sinkDisabled(engineDraft[ent], m=>!!m.disabled);
+  renderEntityEngine();
+}
 function removeModel(ent,idx){ collectAllBlocks(); engineDraft[ent].splice(idx,1); renderEntityEngine(); }
+function toggleModel(ent,idx){
+  if(engineEditing) collectAllBlocks();
+  const src = engineSource();
+  if(!src[ent] || !src[ent][idx]) return;
+  src[ent][idx].disabled = !src[ent][idx].disabled;
+  sinkDisabled(src[ent], m=>!!m.disabled);
+  renderEntityEngine();
+}
 // 供导航守卫使用：是否存在未保存修改
 function engineHasUnsaved(){ if(!engineEditing) return false; collectAllBlocks(); return JSON.stringify(engineDraft)!==JSON.stringify(entityEngineData); }
 renderEntityEngine();
@@ -1776,36 +2094,39 @@ document.querySelectorAll(".tree").forEach(t=>{
   });
 });
 // Address table（含分页 + 新增/修改/删除弹框）
-// 每行：[简称, 全称, 具体地址, 经度(带符号:+东-西), 纬度(带符号:+北-南)]
+// 每行：[简称, 全称, 具体地址, 经度(带符号:+东-西), 纬度(带符号:+北-南), disabled]
 let ADDR_DATA = [
-  ["ACPL","康明斯（安徽）动力有限公司","安徽省合肥市经开区",117.28,31.82],
-  ["BFCEC","北京福田康明斯发动机","北京市昌平区沙河镇",116.40,39.90],
-  ["CCEC","重庆康明斯发动机","重庆市九龙坡区华福大道",106.51,29.53],
-  ["DCEC","东风康明斯发动机","湖北省襄阳市高新区",112.14,32.02],
-  ["GCIC","广西康明斯工业动力","广西南宁市高新区",108.36,22.82],
-  ["XCEC","西安康明斯发动机","陕西省西安市高新区",113.62,34.75],
-  ["CCS-WH","康明斯（武汉）","湖北省武汉市经开区",114.30,30.59],
-  ["CCEC-B","重庆康明斯发动机（二厂）","重庆市九龙坡区",106.55,29.50],
-  ["DCES","东风康明斯排放处理","湖北省襄阳市",112.10,32.05],
-  ["CPGC","康明斯天然气动力","北京市顺义区",116.65,40.13],
-  ["CGTC","康明斯燃气技术中心","上海市嘉定区",121.25,31.38],
-  ["ECJV","东风康明斯合资","湖北省武汉市",114.31,30.52],
+  ["ACPL","康明斯（安徽）动力有限公司","安徽省合肥市经开区",117.28,31.82,false],
+  ["BFCEC","北京福田康明斯发动机","北京市昌平区沙河镇",116.40,39.90,false],
+  ["CCEC","重庆康明斯发动机","重庆市九龙坡区华福大道",106.51,29.53,false],
+  ["DCEC","东风康明斯发动机","湖北省襄阳市高新区",112.14,32.02,false],
+  ["GCIC","广西康明斯工业动力","广西南宁市高新区",108.36,22.82,false],
+  ["XCEC","西安康明斯发动机","陕西省西安市高新区",113.62,34.75,false],
+  ["CCS-WH","康明斯（武汉）","湖北省武汉市经开区",114.30,30.59,false],
+  ["CCEC-B","重庆康明斯发动机（二厂）","重庆市九龙坡区",106.55,29.50,false],
+  ["DCES","东风康明斯排放处理","湖北省襄阳市",112.10,32.05,false],
+  ["CPGC","康明斯天然气动力","北京市顺义区",116.65,40.13,false],
+  ["CGTC","康明斯燃气技术中心","上海市嘉定区",121.25,31.38,false],
+  ["ECJV","东风康明斯合资","湖北省武汉市",114.31,30.52,false],
 ];
 let addrPager = null;
 const addrFmtLng = v => `${Math.abs(v).toFixed(2)}° ${v>=0?"E 东经":"W 西经"}`;
 const addrFmtLat = v => `${Math.abs(v).toFixed(2)}° ${v>=0?"N 北纬":"S 南纬"}`;
 (function(){
-  const rowsFn = ()=> ADDR_DATA.map((r,i)=>
-    `<tr><td>${i+1}</td><td style="text-align:left;font-weight:600">${r[0]}</td><td style="text-align:left">${r[1]}</td><td style="text-align:left">${r[2]}</td>
+  const rowsFn = ()=>{
+    sinkDisabled(ADDR_DATA, r=>!!r[5]);
+    return ADDR_DATA.map((r,i)=>
+    `<tr class="${r[5]?"row-off":""}"><td>${i+1}${r[5]?` <span class="badge-off">已失效</span>`:""}</td><td style="text-align:left;font-weight:600">${r[0]}</td><td style="text-align:left">${r[1]}</td><td style="text-align:left">${r[2]}</td>
     <td>${addrFmtLng(r[3])}</td><td>${addrFmtLat(r[4])}</td>
-    <td><span class="op-link" onclick="openAddrEdit(${i})">修改</span><span class="op-link gray" onclick="deleteAddr(${i})">删除</span></td></tr>`);
+    <td><span class="op-link" onclick="openAddrEdit(${i})">修改</span><span class="op-link gray" onclick="toggleAddr(${i})">${r[5]?"启用":"失效"}</span><span class="op-link gray" onclick="deleteAddr(${i})">删除</span></td></tr>`);
+  };
   addrPager = createPager(rowsFn, document.querySelector("#addrTable tbody"), document.getElementById("addrPager"), 7, 10);
 })();
 let addrEditIdx = -1;
 function openAddrEdit(idx){
   addrEditIdx = idx;
   const isNew = idx < 0;
-  const r = isNew ? ["","","",116.40,39.90] : ADDR_DATA[idx];
+  const r = isNew ? ["","","",116.40,39.90,false] : ADDR_DATA[idx];
   document.getElementById("addrEditTitle").textContent = isNew ? "新增组织地址" : `修改组织地址 · ${r[0]}`;
   document.getElementById("addrShort").value = r[0];
   document.getElementById("addrFull").value = r[1];
@@ -1822,15 +2143,23 @@ function saveAddrEdit(){
   if(!short){ alert("请输入简称"); return; }
   const lng = Math.abs(parseFloat(document.getElementById("addrLng").value)||0) * (document.getElementById("addrLngDir").value==="E"?1:-1);
   const lat = Math.abs(parseFloat(document.getElementById("addrLat").value)||0) * (document.getElementById("addrLatDir").value==="N"?1:-1);
+  const disabled = addrEditIdx < 0 ? false : !!ADDR_DATA[addrEditIdx][5];
   const row = [
     short,
     document.getElementById("addrFull").value.trim(),
     document.getElementById("addrDetail").value.trim(),
-    lng, lat
+    lng, lat, disabled
   ];
   if(addrEditIdx < 0) ADDR_DATA.push(row); else ADDR_DATA[addrEditIdx] = row;
+  sinkDisabled(ADDR_DATA, r=>!!r[5]);
   closeAddrEdit(); if(addrPager) addrPager.refresh();
   alert("组织地址已保存");
+}
+function toggleAddr(idx){
+  const r = ADDR_DATA[idx]; if(!r) return;
+  r[5] = !r[5];
+  sinkDisabled(ADDR_DATA, x=>!!x[5]);
+  if(addrPager) addrPager.refresh();
 }
 function deleteAddr(idx){
   const r = ADDR_DATA[idx];
@@ -1874,9 +2203,9 @@ function pickImport(label){
 }
 // —— 各页模板 ——
 function tplEntity(){
-  const rows = [["Entity","机型(Engine)","类型(轻型/重型/其它)","燃料(燃油/燃气/其它)","备注"]];
-  Object.entries(entityEngineData).forEach(([ent,list])=> list.forEach(m=> rows.push([ent, m.model, m.size, m.fuel, m.note||""])));
-  dlWorkbook("Entity与机型_导入模板.xlsx", [{name:"Entity与机型", rows, cols:[{wch:12},{wch:16},{wch:18},{wch:18},{wch:24}]}]);
+  const rows = [["Entity","Application","Category","Engine Platform","备注"]];
+  Object.entries(entityEngineData).forEach(([ent,list])=> list.forEach(m=> rows.push([ent, m.app, m.category, m.platform, m.note||""])));
+  dlWorkbook("Entity与机型_导入模板.xlsx", [{name:"Entity与机型", rows, cols:[{wch:12},{wch:16},{wch:16},{wch:18},{wch:24}]}]);
 }
 function tplOrg(){
   const rows = [["一级(Consol/JV)","二级(BU)","三级(Entity)"]];
@@ -1896,12 +2225,14 @@ function tplUser(){
 function tplRelation(){
   const main = [["关系ID","供方Entity","需方Entity","产品","信息流","实物流","状态"]];
   REL_MAIN.forEach(r=> main.push(r.slice()));
-  const risk = [["上传版本(Meeting Date)","供方Entity","需方Entity","零件名称","风险描述","风险等级","关系ID"]];
-  REL_RISK.forEach(r=> risk.push(r.slice()));
-  dlWorkbook("供需协同地图_悬浮数据模板.xlsx", [
-    {name:"①协同关系主表", rows:main, cols:[{wch:10},{wch:12},{wch:12},{wch:20},{wch:24},{wch:24},{wch:10}]},
-    {name:"②风险零件(最新版本)", rows:risk, cols:[{wch:20},{wch:12},{wch:12},{wch:16},{wch:40},{wch:10},{wch:10}]}
+  dlWorkbook("供需协同关系_导入模板.xlsx", [
+    {name:"协同关系主表", rows:main, cols:[{wch:10},{wch:12},{wch:12},{wch:20},{wch:24},{wch:24},{wch:10}]}
   ]);
+}
+function tplRiskPart(){
+  const rows = [["上传版本","Entity","零件号","零部件名称","风险描述","影响"]];
+  REL_RISK.forEach(r=> rows.push(r.slice()));
+  dlWorkbook("风险零部件_导入模板.xlsx", [{name:"风险零部件", rows, cols:[{wch:14},{wch:12},{wch:14},{wch:18},{wch:40},{wch:18}]}]);
 }
 
 /* ================= 供需协同关系：示例数据表 ================= */
@@ -1911,12 +2242,142 @@ let REL_MAIN = [
   ["R002","DCEC","ACPL","轻型发动机","需求预测 / 库存共享","整机","启用"],
   ["R003","CCEC","GCIC","工业动力总成","排产计划 / 库存","整机 & 零部件","停用"],
 ];
-// [上传版本(Meeting Date), 供方Entity, 需方Entity, 零件名称, 风险描述, 风险等级]
+// [上传版本, Entity, 零件号, 零部件名称, 风险描述, 影响]
 let REL_RISK = [
-  ["2026-05-15","CCS-WH","XCEC","高压共轨泵","供应周期偏长，需提前 8 周锁定","高"],
-  ["2026-05-15","CCS-WH","XCEC","ECU 芯片","存在缺货风险","高"],
-  ["2026-05-15","DCEC","ACPL","涡轮增压器","交期波动，建议双源","中"],
+  ["2026-05-15","CCS-WH","P-HPFP-001","高压共轨泵","供应周期偏长，需提前 8 周锁定","交期延误 / 排产受阻"],
+  ["2026-05-15","CCS-WH","P-ECU-882","ECU 芯片","存在缺货风险","产能下降"],
+  ["2026-05-15","XCEC","P-TB-330","涡轮增压器","交期波动，建议双源","库存紧张"],
+  ["2026-05-15","DCEC","P-INJ-210","喷油器","关键供应商产能不足","影响 M+2 交付"],
+  ["2026-04-15","ACPL","P-ALT-118","发电机","原材料涨价","成本上升"],
 ];
+let riskPartPager=null;
+let RISK_FILTERED=null; // null=全部
+function msChipValues(id){
+  const el=document.getElementById(id); if(!el) return [];
+  return [...el.querySelectorAll(".ms-chip")].map(c=>{
+    const b=c.querySelector("b"); return (b?c.textContent.replace(b.textContent,""):c.textContent).trim();
+  }).filter(Boolean);
+}
+function getRiskView(){ return RISK_FILTERED || REL_RISK; }
+function renderRiskPartTable(){
+  const rowsFn = ()=> getRiskView().map((r,i)=>
+    `<tr><td>${i+1}</td><td>${r[0]}</td><td style="font-weight:600">${r[1]}</td>
+     <td style="text-align:left">${r[2]}</td><td style="text-align:left">${r[3]}</td>
+     <td style="text-align:left;color:#b91c1c">${r[4]}</td><td style="text-align:left">${r[5]}</td></tr>`);
+  if(riskPartPager){ riskPartPager.refresh(); return; }
+  const tb=document.querySelector("#riskPartTable tbody");
+  const pg=document.getElementById("riskPartPager");
+  if(tb && pg) riskPartPager = createPager(rowsFn, tb, pg, 7, 10);
+  else if(tb) tb.innerHTML = rowsFn().join("");
+}
+function initRiskFilters(){
+  const bind=(id, items)=>{
+    const el=document.getElementById(id); if(!el) return;
+    el.innerHTML="";
+    initMultiSelect(el, [{label:"", items:[...new Set(items)]}], {selectAll:true});
+  };
+  bind("rpFVersion", REL_RISK.map(r=>r[0]));
+  bind("rpFEntity", REL_RISK.map(r=>r[1]));
+  bind("rpFPartNo", REL_RISK.map(r=>r[2]));
+  bind("rpFName", REL_RISK.map(r=>r[3]));
+  bind("rpFDesc", REL_RISK.map(r=>r[4]));
+  bind("rpFImpact", REL_RISK.map(r=>r[5]));
+}
+function filterRiskParts(){
+  const match=(arr, v)=> !arr.length || arr.includes(v);
+  const v=msChipValues("rpFVersion"), e=msChipValues("rpFEntity"), p=msChipValues("rpFPartNo");
+  const n=msChipValues("rpFName"), d=msChipValues("rpFDesc"), i=msChipValues("rpFImpact");
+  RISK_FILTERED = REL_RISK.filter(r=> match(v,r[0])&&match(e,r[1])&&match(p,r[2])&&match(n,r[3])&&match(d,r[4])&&match(i,r[5]));
+  if(riskPartPager) riskPartPager.refresh(); else renderRiskPartTable();
+}
+function resetRiskFilters(){
+  RISK_FILTERED=null;
+  initRiskFilters();
+  if(riskPartPager) riskPartPager.refresh(); else renderRiskPartTable();
+}
+function exportRiskParts(){
+  const rows=[["上传版本","Entity","零件号","零部件名称","风险描述","影响"]];
+  getRiskView().forEach(r=> rows.push(r.slice()));
+  dlWorkbook("风险零部件_导出.xlsx", [{name:"风险零部件", rows, cols:[{wch:14},{wch:12},{wch:14},{wch:18},{wch:40},{wch:18}]}]);
+}
+/* ---- 更新风险弹框 ---- */
+function todayISO(){
+  const t=beijingNow(); return `${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`;
+}
+function riskEditRowHtml(r){
+  r=r||["","","","","",""];
+  const md = r[0] || todayISO();
+  return `<tr>
+    <td style="white-space:nowrap">
+      <button type="button" class="mini-btn add" onclick="addRiskEditRow(this)" title="增加一行">+</button>
+      <button type="button" class="mini-btn del" onclick="delRiskEditRow(this)" title="删除本行">−</button>
+    </td>
+    <td><input type="date" value="${md}"></td>
+    <td><input value="${CURRENT_USER_ENTITY}" disabled style="background:#f7f8fa;color:#374151;font-weight:600"></td>
+    <td><input value="${r[2]||""}" placeholder="零件号"></td>
+    <td><input value="${r[3]||""}" placeholder="零部件名称"></td>
+    <td><input value="${r[4]||""}" placeholder="风险描述"></td>
+    <td><input value="${r[5]||""}" placeholder="影响"></td>
+  </tr>`;
+}
+function openRiskUpdate(){
+  document.querySelector('input[name=hasRisk][value="0"]').checked = true;
+  document.getElementById("riskNoMeetingDate").value = todayISO();
+  document.getElementById("riskNoDateWrap").style.display = "block";
+  document.getElementById("riskUpdateRows").style.display = "none";
+  document.getElementById("riskEditBody").innerHTML = riskEditRowHtml();
+  document.getElementById("riskUpdateMask").classList.add("show");
+}
+function closeRiskUpdate(){ document.getElementById("riskUpdateMask").classList.remove("show"); }
+function onHasRiskChange(){
+  const yes = document.querySelector('input[name=hasRisk]:checked').value==="1";
+  document.getElementById("riskNoDateWrap").style.display = yes ? "none" : "block";
+  document.getElementById("riskUpdateRows").style.display = yes ? "block" : "none";
+  if(yes && !document.getElementById("riskEditBody").children.length){
+    document.getElementById("riskEditBody").innerHTML = riskEditRowHtml();
+  }
+}
+function addRiskEditRow(btn){
+  const tr=btn.closest("tr");
+  tr.insertAdjacentHTML("afterend", riskEditRowHtml());
+}
+function delRiskEditRow(btn){
+  const body=document.getElementById("riskEditBody");
+  if(body.children.length<=1){ alert("至少保留一行，或选择「否」表示无风险"); return; }
+  btn.closest("tr").remove();
+}
+function saveRiskUpdate(){
+  const has = document.querySelector('input[name=hasRisk]:checked').value==="1";
+  if(!has){
+    const md = document.getElementById("riskNoMeetingDate").value;
+    if(!md){ alert("请选择 Meeting Date"); return; }
+    // 无风险：清除当前用户 Entity 的风险（演示），Meeting Date 记入确认记录提示
+    for(let i=REL_RISK.length-1;i>=0;i--){ if(REL_RISK[i][1]===CURRENT_USER_ENTITY) REL_RISK.splice(i,1); }
+    closeRiskUpdate(); RISK_FILTERED=null; initRiskFilters();
+    if(riskPartPager) riskPartPager.refresh(); else renderRiskPartTable();
+    alert(`已确认无风险（Meeting Date：${md}），并更新列表`);
+    return;
+  }
+  const rows=[];
+  document.querySelectorAll("#riskEditBody tr").forEach(tr=>{
+    const ips=[...tr.querySelectorAll("input")].map(i=>i.value.trim());
+    // [Meeting Date, Entity(disabled), 零件号, 名称, 描述, 影响]
+    if(ips[0] && (ips[2]||ips[3]||ips[4]||ips[5])){
+      rows.push([ips[0], CURRENT_USER_ENTITY, ips[2], ips[3], ips[4], ips[5]]);
+    }
+  });
+  if(!rows.length){ alert("请至少填写一行完整风险信息（需选择 Meeting Date）"); return; }
+  const missingDate = [...document.querySelectorAll("#riskEditBody tr")].some(tr=>{
+    const d=tr.querySelector('input[type=date]'); return d && !d.value;
+  });
+  if(missingDate){ alert("请为每一行选择 Meeting Date"); return; }
+  // 用新行替换该 Entity 旧风险（演示逻辑）
+  for(let i=REL_RISK.length-1;i>=0;i--){ if(REL_RISK[i][1]===CURRENT_USER_ENTITY) REL_RISK.splice(i,1); }
+  rows.forEach(r=> REL_RISK.unshift(r));
+  closeRiskUpdate(); RISK_FILTERED=null; initRiskFilters();
+  if(riskPartPager) riskPartPager.refresh(); else renderRiskPartTable();
+  alert("风险信息已更新");
+}
 function renderRelationTables(){
   const mt = document.querySelector("#relMainTable tbody");
   if(mt) mt.innerHTML = REL_MAIN.map((r,i)=>
@@ -1924,10 +2385,6 @@ function renderRelationTables(){
      <td style="text-align:left">${r[3]}</td><td style="text-align:left">${r[4]}</td><td style="text-align:left">${r[5]}</td>
      <td><span class="pill ${r[6]==='启用'?'on':'off'}">${r[6]}</span></td>
      <td><span class="op-link" onclick="openRelEdit(${i})">编辑</span><span class="op-link gray" onclick="deleteRel(${i})">删除</span></td></tr>`).join("");
-  const rt = document.querySelector("#relRiskTable tbody");
-  if(rt) rt.innerHTML = REL_RISK.map((r,i)=>
-    `<tr><td>${i+1}</td><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td style="text-align:left;font-weight:600">${r[3]}</td>
-     <td style="text-align:left;color:#b91c1c">${r[4]}</td></tr>`).join("");
 }
 let relEditIdx = -1;
 function openRelEdit(idx){
@@ -1968,6 +2425,7 @@ function deleteRel(idx){
   }
 }
 renderRelationTables();
+renderRiskPartTable();
 
 /* ================= 通用分页器 ================= */
 function createPager(rowsFn, tbody, footEl, colspan, defaultSize){
@@ -2013,7 +2471,8 @@ let SYS_MENUS=[], SYS_USERS=[], SYS_GROUPS=[], userPager=null, menuPager=null;
     ["业务协同","biz","-","🧩",1,true,1],
     ["上传数据","upload","/upload","📤",1,true,2],
     ["供需协同报告","report","/report","📊",2,true,2],
-    ["供需协同地图","map","/map","🗺️",3,true,2],
+    ["风险零部件","riskpart","/riskpart","⚠",3,true,2],
+    ["供需协同地图","map","/map","🗺️",4,true,2],
     ["数据维护","data","-","🗂️",2,true,1],
     ["Entity 和机型维护","basic-entity","/basic/entity","🔧",1,true,2],
     ["组织层级关系","basic-org","/basic/org","🏢",2,true,2],
@@ -2282,7 +2741,7 @@ function buildOrgGroups(){
 // 机型：从 Entity 和机型维护数据中取出（按 Entity 分组）
 function buildEngineGroups(){
   return Object.entries(entityEngineData).map(([ent,models])=>({
-    label:ent, items:[...new Set(models.map(m=>m.model).filter(Boolean))]
+    label:ent, items:[...new Set(models.map(m=>m.platform).filter(Boolean))]
   })).filter(g=>g.items.length);
 }
 function initMultiSelect(el, groups, opts){
@@ -2329,9 +2788,85 @@ function initMultiSelect(el, groups, opts){
   });
   document.addEventListener("click",(e)=>{ if(!el.contains(e.target)) panel.classList.remove("open"); });
 }
-(function(){
-  const org=document.getElementById("msOrg"); if(org) initMultiSelect(org, buildOrgGroups());
-  const eng=document.getElementById("msEngine"); if(eng) initMultiSelect(eng, buildEngineGroups());
+function initYearMonthTree(el){
+  if(!el) return;
+  const ph = el.dataset.placeholder || "请选择年月";
+  const years = [2025, 2026, 2027];
+  const selected = new Set(); // values like "2026-01"
+  const control = document.createElement("div"); control.className="ms-control";
+  const panel = document.createElement("div"); panel.className="ms-panel ym-tree";
+  // 默认折叠各年；当前年展开
+  const curY = beijingNow().getFullYear();
+  panel.innerHTML = years.map(y=>{
+    const collapsed = y===curY ? "" : "collapsed";
+    const mos = MONTHS.map((m,i)=>`<label class="ym-month"><input type="checkbox" data-y="${y}" value="${y}-${pad(i+1)}">${m}</label>`).join("");
+    return `<div class="ym-block ${collapsed}" data-y="${y}">
+      <label class="ym-year">
+        <span class="ym-caret" data-toggle="${y}">▾</span>
+        <input type="checkbox" class="ym-y" data-y="${y}">${y} 年
+      </label>
+      <div class="ym-months">${mos}</div>
+    </div>`;
+  }).join("");
+  el.appendChild(control); el.appendChild(panel);
+  function render(){
+    if(selected.size===0) control.innerHTML = `<span class="ph">${ph}</span>`;
+    else {
+      const arr=[...selected].sort();
+      const show = arr.slice(0,3).map(s=>`<span class="ms-chip">${s}<b data-v="${s}">✕</b></span>`).join("");
+      control.innerHTML = show + (arr.length>3?`<span class="ms-chip">+${arr.length-3}</span>`:"");
+    }
+    years.forEach(y=>{
+      const months=[...Array(12)].map((_,i)=>`${y}-${pad(i+1)}`);
+      const yBox=panel.querySelector(`.ym-y[data-y="${y}"]`);
+      if(yBox) yBox.checked = months.every(m=>selected.has(m));
+      months.forEach(m=>{ const b=panel.querySelector(`input[value="${m}"]`); if(b) b.checked=selected.has(m); });
+    });
+  }
+  render();
+  control.addEventListener("click",(e)=>{
+    const rm=e.target.closest("b[data-v]");
+    if(rm){ selected.delete(rm.dataset.v); render(); e.stopPropagation(); return; }
+    document.querySelectorAll(".ms-panel.open").forEach(p=>{ if(p!==panel) p.classList.remove("open"); });
+    panel.classList.toggle("open");
+  });
+  // 折叠/展开：点三角
+  panel.addEventListener("click",(e)=>{
+    const caret=e.target.closest(".ym-caret");
+    if(!caret) return;
+    e.preventDefault(); e.stopPropagation();
+    const block=panel.querySelector(`.ym-block[data-y="${caret.dataset.toggle}"]`);
+    if(block) block.classList.toggle("collapsed");
+  });
+  panel.addEventListener("change",(e)=>{
+    const t=e.target;
+    if(t.classList.contains("ym-y")){
+      const y=+t.dataset.y;
+      for(let i=1;i<=12;i++){ const v=`${y}-${pad(i)}`; if(t.checked) selected.add(v); else selected.delete(v); }
+      // 勾选年时自动展开，便于看到月份
+      const block=panel.querySelector(`.ym-block[data-y="${y}"]`);
+      if(block && t.checked) block.classList.remove("collapsed");
+      render(); return;
+    }
+    if(t.type==="checkbox"){
+      if(selected.size>=24 && t.checked){ t.checked=false; alert("最多选择 24 个月"); return; }
+      if(t.checked) selected.add(t.value); else selected.delete(t.value);
+      render();
+    }
+  });
+  document.addEventListener("click",(e)=>{ if(!el.contains(e.target)) panel.classList.remove("open"); });
+}
+(function initReportFilters(){
+  initYearMonthTree(document.getElementById("msYearMonth"));
+  const flat = (id, items)=>{ const el=document.getElementById(id); if(el) initMultiSelect(el, [{label:"", items}], {selectAll:true}); };
+  flat("msConsol", ["Consol"]);
+  flat("msJV", ["JV"]);
+  flat("msBU", ["CBU","PSBU","EBU"]);
+  flat("msEntity", ["ACPL","BFCEC","CCEC","DCEC","GCIC","XCEC","CCS-WH","ECJV"]);
+  flat("msApp", ["On-highway","Off-highway","Industrial","Powergen"]);
+  flat("msCategory", ["Light Duty","Medium Duty","Heavy Duty","Others"]);
+  flat("msPlatform", ["4.5FE","NS6","Frodo","Fencer","15N","15NFE","Off-highway"]);
+  initRiskFilters();
 })();
 
 /* resize charts */

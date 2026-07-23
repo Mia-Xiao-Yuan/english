@@ -119,6 +119,42 @@
     }
     .home-top .warm { color: var(--warm); font-weight: 700; font-variant-numeric: tabular-nums; }
 
+    .timer-box {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+    .timer-box .timer-time {
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+      font-size: 13px;
+      color: var(--text);
+      min-width: 42px;
+      text-align: center;
+    }
+    .timer-box .timer-time.running { color: var(--warm); }
+    .timer-box .timer-time.done { color: #5a9a7e; }
+    .timer-start {
+      border: none;
+      background: var(--warm);
+      color: #fff;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      line-height: 1.2;
+    }
+    .timer-start:disabled {
+      opacity: 0.55;
+      cursor: default;
+    }
+    .timer-start.ghost {
+      background: var(--chip);
+      color: var(--muted);
+    }
+
       .legend {
       display: flex;
       gap: 10px;
@@ -1019,6 +1055,10 @@
     <section class="page active" id="page-home">
       <div class="home-top">
         <span>今日 <span class="warm" id="todayCount">0</span>/10</span>
+        <div class="timer-box">
+          <span class="timer-time" id="timerDisplay">10:00</span>
+          <button class="timer-start" id="timerStart" type="button">开始</button>
+        </div>
         <span>点亮 <span class="warm" id="litCount">2</span>/20 · <span id="streak">3</span>天</span>
       </div>
       <div class="legend">
@@ -2212,6 +2252,77 @@
         document.querySelectorAll('#atlasTabs button').forEach(b => b.classList.toggle('on', b === vbtn));
         renderAtlasList();
       });
+
+      /* —— 10 分钟倒计时 —— */
+      const TIMER_TOTAL = 10 * 60;
+      const timerDisplay = document.getElementById('timerDisplay');
+      const timerStartBtn = document.getElementById('timerStart');
+      let timerLeft = TIMER_TOTAL;
+      let timerId = null;
+      let timerRunning = false;
+
+      function formatTimer(sec) {
+        const m = Math.floor(sec / 60);
+        const s = sec % 60;
+        return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+      }
+
+      function renderTimer() {
+        timerDisplay.textContent = formatTimer(timerLeft);
+        timerDisplay.classList.toggle('running', timerRunning && timerLeft > 0);
+        timerDisplay.classList.toggle('done', !timerRunning && timerLeft === 0);
+      }
+
+      function stopTimerInterval() {
+        if (timerId) {
+          clearInterval(timerId);
+          timerId = null;
+        }
+      }
+
+      function resetTimer() {
+        stopTimerInterval();
+        timerRunning = false;
+        timerLeft = TIMER_TOTAL;
+        timerStartBtn.textContent = '开始';
+        timerStartBtn.disabled = false;
+        timerStartBtn.classList.remove('ghost');
+        renderTimer();
+      }
+
+      function startTimer() {
+        if (timerRunning) return;
+        if (timerLeft <= 0) timerLeft = TIMER_TOTAL;
+        timerRunning = true;
+        timerStartBtn.textContent = '计时中';
+        timerStartBtn.disabled = true;
+        timerStartBtn.classList.add('ghost');
+        renderTimer();
+        stopTimerInterval();
+        timerId = setInterval(() => {
+          timerLeft -= 1;
+          if (timerLeft <= 0) {
+            timerLeft = 0;
+            stopTimerInterval();
+            timerRunning = false;
+            renderTimer();
+            timerStartBtn.textContent = '再来一次';
+            timerStartBtn.disabled = false;
+            timerStartBtn.classList.remove('ghost');
+            toast('今日 10 分钟到，收工啦');
+            return;
+          }
+          renderTimer();
+        }, 1000);
+      }
+
+      timerStartBtn.addEventListener('click', () => {
+        if (!timerRunning && timerLeft === 0) {
+          resetTimer();
+        }
+        startTimer();
+      });
+      renderTimer();
 
       applyTheme(localStorage.getItem('wawa_theme') === 'dark');
       renderFeed();
